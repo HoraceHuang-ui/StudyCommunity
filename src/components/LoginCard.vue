@@ -185,7 +185,11 @@
 			if (response.data.code == 500) {
 				ElMessage.error(response.data.message)
 			} else if (response.data.code == 200) {
-				ElMessage.success(response.data.message)
+				const ret = response.data.obj
+				const _name = ret.name
+				const _roles = ['老师', '老师', '家长', '同学']
+				const _role = _roles[ret.role - 1]
+				ElMessage.success(_name + _role + '，您好！')
 			}
 		} catch (error) {
 			console.error(error)
@@ -214,6 +218,8 @@
 				ElMessage.error(response.data.message)
 			} else if (response.data.code == 200) {
 				ElMessage.success(response.data.message)
+				const ret = response.data.obj
+				phone.value = ret.phonenum
 				regShow.value = false
 			}
 		} catch (error) {
