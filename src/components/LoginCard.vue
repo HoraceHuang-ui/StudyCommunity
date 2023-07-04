@@ -2,12 +2,12 @@
 	<div>
 		<el-card class="login-card">
 			<el-row>
-				<el-col :span="24"><el-input v-model="phone" placeholder="账号/手机号"/></el-col>
+				<el-col :span="24"><el-input v-model="phone" placeholder="手机号"/></el-col>
 			</el-row>
 			<div style="height: 20px;"/>
 			<el-row style="display: flex; justify-content: space-between; align-items: center;">
 				<el-col :span="18"><el-input v-model="pwd" placeholder="密码"/></el-col>
-				<el-col :span="6" link><el-button>忘记密码</el-button></el-col>
+				<el-col :span="6" link><el-button @click="forgotPwd">忘记密码</el-button></el-col>
 			</el-row>
 			<div style="height: 20px;"/>
 			<el-row style="display: flex; justify-content: center;">
@@ -115,19 +115,19 @@
 </template>
 
 <script setup lang="ts">
-	import { ref } from 'vue';
-	import { ElMessage } from 'element-plus';
-	import { Plus } from '@element-plus/icons-vue';
-	import type { UploadProps } from 'element-plus';
-	import axios, { AxiosResponse } from 'axios';
+	import { ref } from 'vue'
+	import { ElMessage, ElMessageBox } from 'element-plus'
+	import { Plus } from '@element-plus/icons-vue'
+	import type { UploadProps } from 'element-plus'
+	import axios, { AxiosResponse } from 'axios'
 	
-	const imageUrl = ref('');
+	const imageUrl = ref('')
 	
 	const handleAvatarSuccess: UploadProps['onSuccess'] = (
 		response,
 		uploadFile
 	) => {
-		imageUrl.value = URL.createObjectURL(uploadFile.raw!);
+		imageUrl.value = URL.createObjectURL(uploadFile.raw!)
 	}
 	const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 	  if (rawFile.type !== 'image/jpeg') {
@@ -140,32 +140,36 @@
 	  return true
 	}
 	
-	const step = ref(1);
-	const regShow = ref(false);
-	const phone = ref('');
-	const pwd = ref('');
-	const newUsername = ref('');
-	const newPhone = ref('');
-	const newPwd = ref('');
-	const newSchool = ref('');
-	const newClazz = ref('');
-	const newSubj = ref('');
-	const newChildID = ref('');
+	const step = ref(1)
+	const regShow = ref(false)
+	const phone = ref('')
+	const pwd = ref('')
+	const newUsername = ref('')
+	const newPhone = ref('')
+	const newPwd = ref('')
+	const newSchool = ref('')
+	const newClazz = ref('')
+	const newSubj = ref('')
+	const newChildID = ref('')
 	const roles = [
 		{id: 1, label: '班主任', desc: '班主任权限说明'},
 		{id: 2, label: '教师', desc: '教师权限说明'},
 		{id: 3, label: '家长', desc: '家长权限说明'},
-		{id: 4, label: '学生', desc: '学生权限说明'},];
+		{id: 4, label: '学生', desc: '学生权限说明'},]
 	const sexes = [
 		{id: 1, label: "男"},
-		{id: 2, label: "女"},];
-	const role = ref(roles[0]);
-	const sex = ref(sexes[0]);
-		
+		{id: 2, label: "女"},]
+	const role = ref(roles[0])
+	const sex = ref(sexes[0])
+	
+	const forgotPwd = () => {
+		ElMessageBox.alert('请联系管理员找回')
+	}
+	
 	const handleDialogClose = () => {
-		regShow.value = false;
-		newUsername.value = '';
-		step.value = 1;
+		regShow.value = false
+		newUsername.value = ''
+		step.value = 1
 	}
 		
 	const login = async () => {
@@ -173,13 +177,18 @@
 			const data = {
 				phonenum: phone.value,
 				password: pwd.value
-			};
+			}
 		
-			const response: AxiosResponse = await axios.post('http://192.168.1.107:8083/common/login', data);
+			const response: AxiosResponse = await axios.post('http://192.168.1.107:8083/common/login', data)
 		
-			console.log(response.data);
-		  } catch (error) {
-			console.error(error);
+			console.log(response.data)
+			if (response.data.code == 500) {
+				ElMessage.error(response.data.message)
+			} else if (response.data.code == 200) {
+				ElMessage.success(response.data.message)
+			}
+		} catch (error) {
+			console.error(error)
 		}
 	}
 	
@@ -196,12 +205,19 @@
 				avatar: ref('aaa').value,
 				cover: ref('bbb').value,
 				code: ref('000000').value
-			};
+			}
 			
-			const response: AxiosResponse = await axios.post('http://192.168.1.107:8083/common/register', regData);
-						console.log(response.data);
-			} catch (error) {
-						console.error(error);
+			const response: AxiosResponse = await axios.post('http://192.168.1.107:8083/common/register', regData)
+			console.log(response.data)
+			
+			if (response.data.code == 500) {
+				ElMessage.error(response.data.message)
+			} else if (response.data.code == 200) {
+				ElMessage.success(response.data.message)
+				regShow.value = false
+			}
+		} catch (error) {
+			console.error(error)
 		}
 	}
 </script>
