@@ -1,5 +1,9 @@
-# StudyCommunity
-项目实践 班级圈 前端项目
+# StudyCommunity-frontend
+项目实践 班级圈
 
-后端：[by ZstarsK & Phoenix](https://github.com/ZstarsK/StudyCommunity)
-> Powered by Elements Plus
+前端repo
+
+后端：[by ZstarsK & Phoenix0356](https://github.com/ZstarsK/StudyCommunity)
+
+# Credits
+- [Element Plus](https://element-plus.org/zh-CN/)
