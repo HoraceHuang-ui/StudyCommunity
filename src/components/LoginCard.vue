@@ -188,21 +188,24 @@ const login = async () => {
 		const _data = response.data
 
 		console.log(_data)
-		const _name = _data.obj.name
-		const _token = _data.obj.tokenHead + _data.obj.token
-		// const _roles = ['老师', '老师', '家长', '同学']
-		// const _role = _roles[ret.role - 1]
-		ElMessage.success(_name + '，您好！')
 
-		// TODO: Store the JWT Token HERE
-		localStorage.setItem('token', _token)
+		if (_data.code == 200) {
+			const _name = _data.obj.name
+			const _token = _data.obj.tokenHead + _data.obj.token
+			ElMessage.success(_name + '，您好！')
 
-		router.push({
-			name: 'mainpage',
-			query: {
-				token: _token
-			}
-		})
+			// TODO: Store the JWT Token HERE
+			localStorage.setItem('token', _token)
+
+			router.push({
+				name: 'mainpage',
+				query: {
+					a: _token
+				}
+			})
+		} else {
+			ElMessage.error(_data.message)
+		}
 	} catch (resp) {
 		console.log(resp)
 		ElMessage.error(resp.message || resp.data.message)
@@ -212,8 +215,8 @@ const login = async () => {
 const register = async () => {
 	try {
 		const regData = {
-			phonenum: newPhone.value,
-			username: newUsername.value,
+			username: newPhone.value,
+			name: newUsername.value,
 			clazz_id: newClazz.value,
 			sex: sex.value.id,
 			role: role.value.id,
@@ -225,7 +228,8 @@ const register = async () => {
 		}
 
 		// const _data = await ApiPost('/api/common/register', regData)
-		const response = await axios.post('/api/common/login', regData)
+		const response = await axios.post('/api/common/register', regData)
+		console.log(response)
 		const _data = response.data
 
 		ElMessage.success(_data.message)

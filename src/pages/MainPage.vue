@@ -2,29 +2,28 @@
 import MainPostCard from '../components/MainPostCard.vue'
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
-import { ApiPost } from '../utils/req';
+import { ApiGet } from '../utils/req';
+import { Token } from '../utils/storage';
 
 const props = defineProps({
-	token: String
+	a: String
 })
 
-const posts = ref([])
 
 onMounted(async () => {
-	const resp = await ApiPost('/api/home', props.token)
+	const data = {
+		token: Token.getToken()
+	}
+	console.log(data.token)
+	const resp = await ApiGet('/home?token=' + data.token)
+	// const resp = await axios.get('/api/home?token=' + data.token)
 	console.log(resp)
-	posts.value = resp.obj
+	const posts = resp.obj
 
-	// axios.get('/api/home', {
-	// 	params: {
-	// 		clazz_id: props.clazz_id
-	// 	}
-	// }).then(response => {
-	// 	console.log(response)
-	// 	posts.value = response.data.obj
-	// }).catch(error => {
-	// 	console.error(error)
-	// })
+	// test get posts
+	console.log(posts[0].phonenum)
+	// TODO: implement MainPostCards
+
 })
 </script>
 
@@ -47,7 +46,7 @@ onMounted(async () => {
 			</el-row>
 		</el-header>
 		<el-main>
-			<div>{{ token }}</div>
+			<div>{{ props.a }}</div>
 			<!-- <li v-for="post in posts">
 				<MainPostCard postID="${post.postid}"></MainPostCard>
 			</li> -->
