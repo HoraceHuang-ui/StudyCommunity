@@ -17,5 +17,6 @@ import LoginCard from '../components/LoginCard.vue'
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+	padding-bottom: 50px;
 }
 </style>

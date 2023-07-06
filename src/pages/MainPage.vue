@@ -4,8 +4,22 @@ import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { ApiGet } from '../utils/req';
 import { Token } from '../utils/storage';
+import { Edit } from '@element-plus/icons-vue'
 
 const posts = ref([])
+
+const userInfo = ref({
+	username: '',
+	name: '',
+	clazzId: '',
+	schoolId: '',
+	sex: '',
+	role: '',
+	avatar: '',
+	cover: ''
+})
+
+const roles = ['班主任', '老师', '家长', '学生']
 
 onMounted(async () => {
 	const postsResp = await ApiGet('home?token=' + Token.getToken())
@@ -13,51 +27,77 @@ onMounted(async () => {
 	console.log(postsResp)
 	posts.value = postsResp.obj
 	console.log(posts.value)
-
+	
+	const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
+	console.log(userResp)
+	userInfo.value = userResp.obj
 })
+
+const newPostClick = () => {
+
+}
 </script>
 
 <template>
-	<div class="common-layout">
-		<el-container>
-			<el-header>
-				<el-row style="width: 100%;">
-					<el-col :span="12">
-						<div class="header-left">
-							<div>logo</div>
-							<div>学校</div>
-							<div>班级</div>
-						</div>
-					</el-col>
-					<el-col :span="12">
-						<div class="header-right">
-							<div>姓名</div>
-							<div>头像</div>
-						</div>
-					</el-col>
-				</el-row>
-			</el-header>
-			<el-main>
-				<li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
-					<MainPostCard :postID="post.postId" class="post-card"></MainPostCard>
-				</li>
-				<div v-if="posts.length == 0" class="no-post">
-					当前班级暂无动态
+	<div class="navbar">
+		<el-row>
+			<el-col :span="12">
+				<div class="header-left">
+					<div class="navbar-item">{{ userInfo.schoolId }}</div>
+					<div class="navbar-item">{{ userInfo.clazzId }}</div>
+					<el-tag class="navbar-item">{{ roles[userInfo.role - 1] }}</el-tag>
 				</div>
-			</el-main>
-		</el-container>
+			</el-col>
+			<el-col :span="12">
+				<div class="header-right">
+					<el-dropdown class="navbar-item">{{ userInfo.name }}<el-icon class="el-icon--right"><arrow-down /></el-icon></el-dropdown>
+					<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
+					<el-avatar :src="userInfo.avatar" size="small"
+						class="navbar-item"></el-avatar>
+				</div>
+			</el-col>
+		</el-row>
 	</div>
+	<el-container class="common-layout">
+		<el-main>
+			<el-button class="main-width" type="primary" :icon="Edit" plain @click="newPostClick">写一条动态…</el-button>
+			<li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
+				<MainPostCard :postID="post.postId" class="post-card"></MainPostCard>
+			</li>
+			<div v-if="posts.length == 0" class="no-post">
+				当前班级暂无动态
+			</div>
+		</el-main>
+		<el-backtop :right="50" :bottom="50" />
+	</el-container>
 </template>
 
-<style>
-.common-layout {
-	display: flex;
+<style scoped>
+.navbar {
+	position: sticky;
+	padding: 10px;
+	z-index: 2001;
+	top: 0px;
 	width: 100%;
+	left: 0px;
+	background-color: white;
+	/* 阴影  水平阴影距离，垂直阴影距离， 模糊尺寸， 阴影尺寸 颜色*/
+	box-shadow: 0 2px 4px 0 rgb(0, 0, 0, 10%);
+}
+
+.navbar-item {
+	margin: 0 5px 0 5px;
+}
+
+.main-width {
+	width: 50%;
+	min-width: 300px;
 }
 
 .header-left {
 	display: flex;
 	flex-direction: row;
+	height: 100%;
 }
 
 .header-right {
@@ -79,7 +119,6 @@ onMounted(async () => {
 
 .no-post {
 	display: flex;
-	justify-self: center;
-	align-self: center;
+	text-align: center;
 }
 </style>

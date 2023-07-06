@@ -219,7 +219,7 @@ const register = async () => {
 			role: role.value.id,
 			schoolId: newSchool.value,
 			password: newPwd.value,
-			avatar: ref('aaa').value,
+			avatar: ref('https://avatars.githubusercontent.com/u/67905897?v=4').value,
 			cover: ref('bbb').value,
 			code: ref('000000').value
 		}
