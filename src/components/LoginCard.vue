@@ -198,10 +198,7 @@ const login = async () => {
 			localStorage.setItem('token', _token)
 
 			router.push({
-				name: 'mainpage',
-				query: {
-					a: _token
-				}
+				name: 'mainpage'
 			})
 		} else {
 			ElMessage.error(_data.message)
@@ -217,17 +214,17 @@ const register = async () => {
 		const regData = {
 			username: newPhone.value,
 			name: newUsername.value,
-			clazz_id: newClazz.value,
+			clazzId: newClazz.value,
 			sex: sex.value.id,
 			role: role.value.id,
-			school_id: newSchool.value,
+			schoolId: newSchool.value,
 			password: newPwd.value,
 			avatar: ref('aaa').value,
 			cover: ref('bbb').value,
 			code: ref('000000').value
 		}
 
-		// const _data = await ApiPost('/api/common/register', regData)
+		// const _data = await ApiPost('/common/register', regData)
 		const response = await axios.post('/api/common/register', regData)
 		console.log(response)
 		const _data = response.data
@@ -235,7 +232,7 @@ const register = async () => {
 		ElMessage.success(_data.message)
 		// const ret = _data.obj
 		// phone.value = ret.phonenum
-		regShow.value = false
+		handleDialogClose()
 	} catch (error) {
 		console.error(error)
 		ElMessage.error(error.message || error.data.message)

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { ApiGet } from '../utils/req'
 
 const props = defineProps({
 	postID: String
@@ -17,16 +18,16 @@ const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c672
 
 onMounted(async () => {
 	try {
-		const response = await axios.get('/api/post/get', {
-			params: {
-				post_id: props.postID
-			}
-		});
-		console.log(response);
-		const ret = response.data.obj;
-		name.value = ret.name;
-		phone.value = ret.phonenum;
-		// 设置其他属性的值
+		const response = await ApiGet('post/get?postId=' + props.postID)
+		// const response = await axios.get('/api/post/get', { postId: props.postID })
+		console.log(response)
+		const ret = response.obj
+		name.value = ret.name
+		phone.value = ret.phonenum
+		title.value = ret.title
+		timestamp.value = ret.timestamp
+		detail.value = ret.detail
+		image.value = ret.image
 	} catch (error) {
 		console.error(error);
 	}
@@ -38,7 +39,7 @@ onMounted(async () => {
 		<template #header>
 			<div class="card-header">
 				<div>
-					<!--<el-avatar :size="50" :src="${this.tempAvatar}"></el-avatar>-->
+					<el-avatar :size="30" :src="this.tempAvatar"></el-avatar>
 					<div>{{ name }}</div>
 				</div>
 				<div>
@@ -68,6 +69,6 @@ onMounted(async () => {
 
 .post-card {
 	width: 50%;
-	min-width: 480px;
+	min-width: 340px;
 }
 </style>
