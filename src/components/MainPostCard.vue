@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { ApiGet } from '../utils/req'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
 	postID: String
@@ -43,10 +44,16 @@ onMounted(async () => {
 	} catch (error) {
 		console.error(error);
 	}
-});
+})
 
+const router = useRouter()
 const cardClick = () => {
-	console.log('clicked ' + postInfo.value.postId)
+	router.push({
+		name: 'postinfo',
+		query: {
+			postId: postInfo.value.postId
+		}
+	})
 }
 </script>
 
@@ -54,7 +61,9 @@ const cardClick = () => {
 	<el-card class="main-width post-card" @click="cardClick" shadow="hover" :body-style="{ padding: '10px' }">
 		<div class="card-header">
 			<div class="card-header-left">
-				<el-avatar size="small" :src="this.tempAvatar" style="margin: 5px;"></el-avatar>
+				<el-avatar v-if="!userInfo.avatar || userInfo.avatar == ''" size="small" :src="this.tempAvatar"
+					style="margin: 5px;"></el-avatar>
+				<el-avatar v-else size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
 				<div style="padding-top: 9px; margin-left: 5px; font-size: 10px;">{{ userInfo.name }}</div>
 			</div>
 			<div style="margin-top: 9px; margin-right: 7px; font-size: 10px;">点赞：{{ postInfo.likes }}</div>
@@ -66,8 +75,7 @@ const cardClick = () => {
 		</div>
 		<div class="detail-block"></div>
 		<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-		<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image"
-			class="body-image" />
+		<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image" />
 		<div class="body-detail">{{ postInfo.detail }} 正文省略正文省略正文省略正文省略正文省略正文省略正文省略
 			正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略</div>
 	</el-card>

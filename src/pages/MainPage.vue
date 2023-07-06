@@ -58,7 +58,7 @@ const newPostClick = () => {
 			</el-col>
 		</el-row>
 	</div>
-	<el-container class="common-layout">
+	<el-container>
 		<el-main>
 			<el-button class="main-width" type="primary" :icon="Edit" plain @click="newPostClick">写一条动态…</el-button>
 			<li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
