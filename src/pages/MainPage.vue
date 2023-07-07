@@ -27,7 +27,7 @@ onMounted(async () => {
 	console.log(postsResp)
 	posts.value = postsResp.obj
 	console.log(posts.value)
-	
+
 	const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
 	console.log(userResp)
 	userInfo.value = userResp.obj
@@ -50,10 +50,10 @@ const newPostClick = () => {
 			</el-col>
 			<el-col :span="12">
 				<div class="header-right">
-					<el-dropdown class="navbar-item">{{ userInfo.name }}<el-icon class="el-icon--right"><arrow-down /></el-icon></el-dropdown>
+					<el-dropdown class="navbar-item">{{ userInfo.name }}<el-icon
+							class="el-icon--right"><arrow-down /></el-icon></el-dropdown>
 					<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-					<el-avatar :src="userInfo.avatar" size="small"
-						class="navbar-item"></el-avatar>
+					<el-avatar :src="userInfo.avatar" size="small" class="navbar-item"></el-avatar>
 				</div>
 			</el-col>
 		</el-row>
@@ -118,7 +118,7 @@ const newPostClick = () => {
 }
 
 .no-post {
-	display: flex;
 	text-align: center;
+	margin-top: 20px;
 }
 </style>
