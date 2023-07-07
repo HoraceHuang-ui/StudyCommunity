@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { ApiGet } from '../utils/req'
+import { ApiGet, ApiPost } from '../utils/req'
 import { useRouter } from 'vue-router'
+import { Token } from '../utils/storage';
 
 const props = defineProps({
 	postId: String
@@ -46,8 +47,17 @@ onMounted(async () => {
 	}
 })
 
-const likeClick = () => {
-	console.log('hit like')
+const likeClick = async () => {
+	const data = {
+		postId: postInfo.value.postId,
+		likes: postInfo.value.likes * 1 + 1
+	}
+	console.log(data)
+	const likeResp = await ApiPost('post/likes/update', data)
+	// const likeResp = await axios.post('/api/post/likes/update', data)
+	// const likeResp = await axios.post('/api/post/likes/update?postId=' + data.postId + '&likes=' + data.likes, { headers })
+	console.log(likeResp)
+	postInfo.value.likes = data.likes.toString()
 }
 </script>
 

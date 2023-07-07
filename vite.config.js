@@ -8,6 +8,7 @@ export default defineConfig({
     // set a proxy to backend entry point
     proxy: {
       "/api": {
+        // 1.117.52.175
         target: "http://1.117.52.175:8083",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
