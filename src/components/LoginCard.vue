@@ -94,21 +94,25 @@
 			</div>
 
 			<div v-if="step == 3">
-				<el-upload class="avatar-uploader" action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-					:show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+				<!-- <el-upload class="avatar-uploader" action="/api/common/register/upload" :show-file-list="false"
+					:on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
 					<img v-if="imageUrl" :src="imageUrl" class="avatar" />
 					<el-icon v-else class="avatar-uploader-icon">
 						<Plus />
 					</el-icon>
-				</el-upload>
+				</el-upload> -->
+				<input style="width: 74px;" type="file" id="uFile" name="uFile" @change="upload($event)" />
 				<div style="height: 30px;" />
 			</div>
 
 			<el-row style="display: flex; justify-content: center;">
-				<el-col v-if="step == 1" :span="6"><el-button @click="handleDialogClose" plain>取消</el-button></el-col>
-				<el-col v-if="step > 1" :span="6"><el-button @click="step--" plain>上一步</el-button></el-col>
-				<el-col v-if="step < 3" :span="6"><el-button @click="step++" type="primary">下一步</el-button></el-col>
-				<el-col v-if="step == 3" :span="6"><el-button @click="register" type="primary">完成</el-button></el-col>
+				<el-col v-if="step == 1 || step == 3" :span="6"><el-button @click="handleDialogClose"
+						plain>取消</el-button></el-col>
+				<el-col v-if="step > 1 && step < 3" :span="6"><el-button @click="step--" plain>上一步</el-button></el-col>
+				<el-col v-if="step < 2" :span="6"><el-button @click="step++" type="primary">下一步</el-button></el-col>
+				<el-col v-if="step == 2" :span="6"><el-button @click="register" type="primary">确认信息</el-button></el-col>
+				<el-col v-if="step == 3" :span="6"><el-button @click="handleDialogClose"
+						type="primary">完成</el-button></el-col>
 			</el-row>
 		</el-dialog>
 	</div>
@@ -124,12 +128,16 @@ import axios from 'axios'
 import { Token } from '../utils/storage'
 
 const imageUrl = ref('')
+const urlResp = ref('')
+const tempAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
 const handleAvatarSuccess = (
 	response,
 	uploadFile
 ) => {
 	imageUrl.value = URL.createObjectURL(uploadFile.raw)
+	urlResp.value = response.obj
+	ElMessage.info("请勿继续上传头像，谢谢配合！")
 }
 const beforeAvatarUpload = (rawFile) => {
 	if (rawFile.type !== 'image/jpeg') {
@@ -194,7 +202,6 @@ const login = async () => {
 			const _token = _data.obj.tokenHead + _data.obj.token
 			ElMessage.success(_name + '，您好！')
 
-			// TODO: Store the JWT Token HERE
 			localStorage.setItem('token', _token)
 
 			router.push({
@@ -219,7 +226,8 @@ const register = async () => {
 			role: role.value.id,
 			schoolId: newSchool.value,
 			password: newPwd.value,
-			avatar: ref('https://avatars.githubusercontent.com/u/67905897?v=4').value,
+			// https://avatars.githubusercontent.com/u/67905897?v=4
+			avatar: tempAvatar,
 			cover: ref('bbb').value,
 			code: ref('000000').value
 		}
@@ -232,11 +240,35 @@ const register = async () => {
 		ElMessage.success(_data.message)
 		// const ret = _data.obj
 		// phone.value = ret.phonenum
-		handleDialogClose()
+		step.value++
 	} catch (error) {
 		console.error(error)
 		ElMessage.error(error.message || error.data.message)
 	}
+}
+
+const upload = (e) => {
+	var files = document.getElementById('uFile').value;
+	if (!/\.(gif|jpg|jpeg|png|gif|jpg|png)$/i.test(files)) {
+		ElMessage.warning("图片类型必须是.gif,jpeg,jpg,png中的一种,请重新上传")
+		return false;
+	}
+	let file = e.target.files[0]
+	let param = new FormData()
+	param.append('username', newPhone.value)
+	param.append('file', file)       // 通过append向form对象添加数据
+	let config = {
+		headers: { 'Content-Type': 'multipart/form-data' }
+	}
+	axios.post("/api/common/register/upload", param, config).then((res) => {
+		if (res.data.code = 200) {
+			ElMessage.success("添加成功")  //需要引入element
+		} else {
+			ElMessage.warning("添加失败")
+		}
+	}).catch((err) => {
+		ElMessage.warning("图片上传失败，请重新上传!")
+	})
 }
 </script>
 

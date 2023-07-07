@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted, onBeforeMount } from 'vue'
 import PostInfoCard from '../components/PostInfoCard.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { Token } from '../utils/storage';
-import { ApiGet } from '../utils/req'
+import { ApiGet, ApiPost } from '../utils/req'
 
 const route = useRoute()
+const router = useRouter()
 const postID = route.query.postId
 const comments = ref([])
 const commentSenders = ref([])
@@ -19,6 +20,13 @@ const userInfo = ref({
     role: '',
     avatar: '',
     cover: ''
+})
+const commentToSend = ref({
+    commentId: '',
+    postId: '',
+    username: '',
+    detail: '',
+    postTime: ''
 })
 const roles = ['班主任', '老师', '家长', '学生']
 const commentText = ref('')
@@ -38,15 +46,26 @@ onMounted(async () => {
             const comment = comments.value[i]
             const commUserResp = await ApiGet('getUserinfoById?username=' + comment.username)
             commentSenders.value.push(commUserResp.obj)
-            console.log(commentSenders.value)
         }
     } catch (error) {
         console.error(error);
     }
 })
 
-const sendComment = () => {
-    console.log('hit send' + commentToId.value)
+const sendComment = async () => {
+    commentToSend.value.detail = commentText.value
+    commentToSend.value.postId = postID
+    console.log('comment on ' + postID)
+    commentToSend.value.username = userInfo.value.username
+    if (commentToId.value != '') commentToSend.value.commentId = commentToId.value
+    else commentToSend.value.commentId = null
+    commentToSend.value.postTime = getTimestamp()
+
+    const commResp = await ApiPost('comment/save', commentToSend.value)
+    console.log(commResp)
+
+    commentToId.value = ''
+    location.reload()
 }
 
 // let curComment = 0
@@ -58,6 +77,14 @@ const sendComment = () => {
 //     commentSenders.value.push(userResp.obj)
 //     console.log(userResp.obj)
 // }
+
+const getTimestamp = () => {
+    const today = new Date();
+    const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const timestamp = date + ' ' + time;
+    return timestamp;
+}
 </script>
 
 <template>
@@ -106,9 +133,7 @@ const sendComment = () => {
                                         }}</el-text>
                                     </div>
                                 </div>
-                                <div style="text-align: left;">{{ comment.detail }}评论正文评论正文评论正文评论正文评论正文评论正文评论正文评论正文
-                                    评论正文评论正文评论正文评论正文评论正文评论正文评论正文评论正文
-                                    评论正文评论正文评论正文评论正文评论正文评论正文评论正文评论正文end</div>
+                                <div style="text-align: left;">{{ comment.detail }}</div>
                             </div>
                         </el-col>
                     </el-row>

@@ -42,6 +42,10 @@ onMounted(async () => {
 		const userResp = await ApiGet('getUserinfoById?username=' + postInfo.value.username)
 		console.log(userResp)
 		userInfo.value = userResp.obj
+
+		// postInfo.value.title = 'changed'
+		// temp
+		// const delResp = await axios.delete('/api/post/update', postInfo.value)
 	} catch (error) {
 		console.error(error);
 	}
@@ -50,14 +54,19 @@ onMounted(async () => {
 const likeClick = async () => {
 	const data = {
 		postId: postInfo.value.postId,
-		likes: postInfo.value.likes * 1 + 1
+		likes: postInfo.value.likes * 1
 	}
 	console.log(data)
-	const likeResp = await ApiPost('post/likes/update', data)
-	// const likeResp = await axios.post('/api/post/likes/update', data)
+	const headers = {
+		'Content-Type': 'application/json',
+		Authorization: Token.getToken()
+	}
+	// const likeResp = await ApiPost('post/likes/update', data)
+	const likeResp = await axios.put('/api/post/likes/update', data, { headers })
+	// const likeResp = await axios.post('/api/post/likes/update', data, { headers })
 	// const likeResp = await axios.post('/api/post/likes/update?postId=' + data.postId + '&likes=' + data.likes, { headers })
 	console.log(likeResp)
-	postInfo.value.likes = data.likes.toString()
+	postInfo.value.likes = likeResp.data.toString()
 }
 </script>
 
@@ -66,7 +75,7 @@ const likeClick = async () => {
 		<div class="card-header">
 			<div class="card-header-left">
 				<el-avatar size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
-				<div style="padding-top: 9px; margin-left: 5px; font-size: 10px;">{{ userInfo.name }}</div>
+				<div style="padding-top: 9px; margin-left: 5px; font-size: 13px;">{{ userInfo.name }}</div>
 			</div>
 			<el-button style="margin-right: 7px; font-size: 10px;" type="primary" plain @click="likeClick">点赞：{{
 				postInfo.likes }}</el-button>
