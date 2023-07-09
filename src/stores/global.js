@@ -15,6 +15,8 @@ export const useGlobalStore = defineStore("global", () => {
   });
 
   const userCache = reactive({});
+  const postCache = reactive({});
+  const commentCache = reactive({});
 
   const setUserInfo = (_userInfo) => {
     userInfo.value = { ..._userInfo };
@@ -23,11 +25,16 @@ export const useGlobalStore = defineStore("global", () => {
   const addUserCache = (_userInfo) => {
     userCache[_userInfo.username] = _userInfo;
   };
+  const addPostCache = (_postInfo) => {
+    postCache[_postInfo.postId] = _postInfo;
+  };
 
   return {
     userInfo,
     setUserInfo,
     userCache,
     addUserCache,
+    postCache,
+    addPostCache,
   };
 });

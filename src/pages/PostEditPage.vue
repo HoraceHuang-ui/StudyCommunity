@@ -3,7 +3,7 @@ import TopHeader from '../components/TopHeader.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
-import { Promotion } from '@element-plus/icons-vue'
+import { Promotion, Delete } from '@element-plus/icons-vue'
 import { ApiGet, ApiPost } from '../utils/req';
 import { Token } from '../utils/storage';
 import { Edit } from '@element-plus/icons-vue'
@@ -26,24 +26,61 @@ const upload = async (e) => {
     }
     let file = e.target.files[0]
     let param = new FormData()
-    param.append('postId', editPostId.value)
-    param.append('file', file)
     let config = {
         headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: Token.getToken()
         }
     }
-    await axios.post(editPostId.value == '' ? "/api/post/file/save" : "/api/post/file/update", param, config).then((res) => {
+    if (editPostId.value == '') {
+        param.append('postId', editPostId.value)
+        param.append('file', file)
+        await axios.post("/api/post/file/save", param, config).then((res) => {
+            if (res.data.code = 200) {
+                ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
+                editImage.value = res.data.obj[0]
+                editPostId.value = res.data.obj[1]
+            }
+        }).catch(() => { })
+    } else {
+        param.append('postId', editPostId.value)
+        param.append('url', editImage.value)
+        param.append('file', file)
+        console.log(editPostId.value)
+        console.log(editImage.value)
+        console.log(file)
+        await axios.put("/api/post/file/update", param, config).then((res) => {
+            if (res.data.code = 200) {
+                ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
+                editImage.value = res.data.obj[0]
+                editPostId.value = res.data.obj[1]
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+}
+
+const deleteClick = async () => {
+    let param = new FormData()
+    let config = {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: Token.getToken()
+        }
+    }
+    param.append('postId', editPostId.value)
+    param.append('url', editImage.value)
+    // param.append('file', null)
+    param.append('file', new Blob([], { type: 'application/octet-stream' }), 'emptyFile')
+    await axios.put("/api/post/file/update", param, config).then((res) => {
         if (res.data.code = 200) {
-            ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
+            ElMessage.success("删除成功，请勿继续上传，谢谢配合！")
             editImage.value = res.data.obj[0]
             editPostId.value = res.data.obj[1]
-        } else {
-            ElMessage.warning("添加失败")
         }
-    }).catch(() => {
-        ElMessage.warning("图片上传失败，请重新上传!")
+    }).catch((err) => {
+        console.log(err)
     })
 }
 
@@ -72,6 +109,7 @@ const sendClick = async () => {
         // update post
         await axios.put('/api/post/update', data, { headers })
     }
+    globalStore.addPostCache(data)
     router.go(-1)
 }
 
@@ -79,12 +117,19 @@ const route = useRoute()
 onMounted(async () => {
     if (route.query.postId && route.query.postId != '') {
         editPostId.value = route.query.postId
-        const postResp = await ApiGet('post/get?postId=' + editPostId.value)
 
-        editPostId.value = postResp.obj.postId
-        editTitle.value = postResp.obj.title
-        editDetail.value = postResp.obj.detail
-        editImage.value = postResp.obj.image
+        const postItem = globalStore.postCache[editPostId.value]
+        if (!postItem) {
+            const postResp = await ApiGet('post/get?postId=' + editPostId.value)
+            globalStore.addPostCache(postResp.obj)
+            editTitle.value = postResp.obj.title
+            editDetail.value = postResp.obj.detail
+            editImage.value = postResp.obj.image
+        } else {
+            editTitle.value = postItem.title
+            editDetail.value = postItem.detail
+            editImage.value = postItem.image
+        }
     }
 })
 
@@ -109,7 +154,9 @@ const getTimestamp = () => {
         <div style="height: 10px;"></div>
         <el-input class="main-width" v-model="editDetail" placeholder="输入正文…" :autosize="{ minRows: 3 }" type="textarea" />
         <div class="main-width word-count-text">字数：{{ editDetail.length }} / 9999</div>
-        <div class="main-width" style="margin-top: 10px; text-align: left;">上传图片：</div>
+        <div class="main-width" style="margin-top: 10px; text-align: left;" @click="deleteClick">上传图片：<el-icon>
+                <Delete />
+            </el-icon></div>
         <input class="main-width" style="margin-top: 10px;" type="file" id="uFile" name="uFile" @change="upload($event)" />
         <el-image v-if="editImage != ''" class="main-width" style="margin-top: 10px; border-radius: 20px;"
             :src="editImage"></el-image>

@@ -188,7 +188,10 @@ const getTimestamp = () => {
 }
 
 .comment-block-left {
-    display: grid;
+    padding-right: 10px;
+    display: flex;
+    justify-items: right;
+    justify-content: right;
 }
 
 .comment-block-right {
@@ -224,5 +227,11 @@ const getTimestamp = () => {
     margin-top: 5px;
     background-color: #F0F0F0;
     border-radius: 7px;
+    line-height: 15px;
+    max-height: 66px;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
 }
 </style>

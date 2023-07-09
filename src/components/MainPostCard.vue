@@ -24,7 +24,6 @@ const postInfo = ref({
 	clazzId: '',
 	likes: '',
 	image: '',
-	video: '',
 	postTime: ''
 })
 const userInfo = ref({
@@ -41,8 +40,14 @@ const roles = ['班主任', '老师', '家长', '学生']
 
 onMounted(async () => {
 	try {
-		const postResp = await ApiGet('post/get?postId=' + props.postID)
-		postInfo.value = postResp.obj
+		const postItem = globalStore.postCache[props.postID]
+		if (!postItem) {
+			const postResp = await ApiGet('post/get?postId=' + props.postID)
+			globalStore.addPostCache(postResp.obj)
+			postInfo.value = postResp.obj
+		} else {
+			postInfo.value = postItem
+		}
 
 		const userItem = globalStore.userCache[postInfo.value.username]
 		if (!userItem) {
@@ -207,7 +212,7 @@ const cardClick = () => {
 	position: relative;
 	margin-top: 1vh;
 	line-height: 20px;
-	height: 60px;
+	max-height: 60px;
 	overflow: hidden;
 	-webkit-line-clamp: 3;
 	-webkit-box-orient: vertical;

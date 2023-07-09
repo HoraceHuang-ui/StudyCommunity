@@ -20,7 +20,6 @@ const postInfo = ref({
 	clazzId: '',
 	likes: '',
 	image: '',
-	video: '',
 	postTime: ''
 })
 const userInfo = ref({
@@ -36,8 +35,14 @@ const userInfo = ref({
 
 onMounted(async () => {
 	try {
-		const postResp = await ApiGet('post/get?postId=' + props.postId)
-		postInfo.value = postResp.obj
+		const postItem = globalStore.postCache[postInfo.value.postId]
+		if (!postItem) {
+			const postResp = await ApiGet('post/get?postId=' + props.postId)
+			globalStore.addPostCache(postResp.obj)
+			postInfo.value = postResp.obj
+		} else {
+			postInfo.value = postItem
+		}
 
 		const userItem = globalStore.userCache[postInfo.value.username]
 		if (!userItem) {
