@@ -47,10 +47,10 @@ const newClazz = ref('')
 const newSubj = ref('')
 const newChildID = ref('')
 const roles = [
-	{ id: 1, label: '班主任', desc: '班主任权限说明' },
-	{ id: 2, label: '教师', desc: '教师权限说明' },
-	{ id: 3, label: '家长', desc: '家长权限说明' },
-	{ id: 4, label: '学生', desc: '学生权限说明' },]
+	{ id: 1, label: '班主任', desc: '班主任可查看并删除本班级的任意动态，并拥有教师的所有权限' },
+	{ id: 2, label: '教师', desc: '教师可查看本班级动态，并可设置教学课程' },
+	{ id: 3, label: '家长', desc: '家长可查看本班级动态，并可设置对应子女的绑定信息' },
+	{ id: 4, label: '学生', desc: '学生可查看本班级动态，并编辑、删除自己发送的动态' },]
 const sexes = [
 	{ id: 1, label: "男" },
 	{ id: 2, label: "女" },]
@@ -179,7 +179,9 @@ const upload = async (e) => {
 				</el-row>
 				<div style="height: 10px;" />
 				<el-row>
-					<el-col :span="1"></el-col>
+					<el-col :span="1">
+						<div style="color: red">*</div>
+					</el-col>
 					<el-col :span="23"><el-input v-model="newPhone" placeholder="用户名"></el-input></el-col>
 				</el-row>
 				<div style="height: 10px;" />

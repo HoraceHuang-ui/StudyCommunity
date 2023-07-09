@@ -46,14 +46,10 @@ const upload = async (e) => {
         param.append('postId', editPostId.value)
         param.append('url', editImage.value)
         param.append('file', file)
-        console.log(editPostId.value)
-        console.log(editImage.value)
-        console.log(file)
         await axios.put("/api/post/file/update", param, config).then((res) => {
             if (res.data.code = 200) {
                 ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
-                editImage.value = res.data.obj[0]
-                editPostId.value = res.data.obj[1]
+                editImage.value = res.data.obj
             }
         }).catch((err) => {
             console.log(err)
@@ -76,8 +72,7 @@ const deleteClick = async () => {
     await axios.put("/api/post/file/update", param, config).then((res) => {
         if (res.data.code = 200) {
             ElMessage.success("删除成功，请勿继续上传，谢谢配合！")
-            editImage.value = res.data.obj[0]
-            editPostId.value = res.data.obj[1]
+            editImage.value = ''
         }
     }).catch((err) => {
         console.log(err)

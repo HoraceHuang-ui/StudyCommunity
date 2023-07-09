@@ -167,7 +167,7 @@ const cardClick = () => {
 }
 
 .body-title {
-	margin-top: 6vh;
+	margin-top: 4vh;
 }
 
 .info-title {
