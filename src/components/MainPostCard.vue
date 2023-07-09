@@ -38,7 +38,6 @@ const userInfo = ref({
 	cover: ''
 })
 const roles = ['班主任', '老师', '家长', '学生']
-// const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
 
 onMounted(async () => {
 	try {
@@ -105,9 +104,8 @@ const cardClick = () => {
 		<el-card class="main-width" @click="cardClick" shadow="hover" :body-style="{ padding: '10px' }">
 			<div class="card-header">
 				<div class="card-header-left">
-					<el-avatar v-if="!userInfo.avatar || userInfo.avatar == ''" size="small" :src="this.tempAvatar"
-						style="margin: 5px;"></el-avatar>
-					<el-avatar v-else size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
+					<el-avatar size="small" :src="userInfo.avatar" style="margin: 5px;"> <img
+							src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" /></el-avatar>
 					<div style="padding-top: 9px; margin-left: 5px; font-size: 10px;">
 						{{ userInfo.name }}
 						<el-tag style="margin-left: 5px;">{{ roles[userInfo.role - 1] }}</el-tag>

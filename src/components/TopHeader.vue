@@ -3,8 +3,8 @@ import { useRouter } from 'vue-router'
 import { ArrowLeftBold, House, ArrowDown } from '@element-plus/icons-vue'
 import { ApiGet } from '../utils/req'
 import { ref, onMounted, watch } from 'vue'
-import { Token } from '../utils/storage';
-import { useGlobalStore } from '../stores/global';
+import { Token } from '../utils/storage'
+import { useGlobalStore } from '../stores/global'
 const props = defineProps({
     showBackButton: Boolean,
 })
@@ -27,14 +27,13 @@ const logoutClick = () => {
         name: "login"
     })
 }
-const avatarClick = () => {
-    router.push({
-        name: "personposts",
-        query: {
-            userId: props.userInfo.username
-        }
-    })
-}
+
+onMounted(async () => {
+    if (globalStore.userInfo.username === '') {
+        const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
+        globalStore.setUserInfo(userResp.obj);
+    }
+})
 </script>
 
 <template>
@@ -73,8 +72,8 @@ const avatarClick = () => {
                         </template>
                     </el-dropdown>
                     <!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-                    <el-avatar @click="avatarClick" :src="globalStore.userInfo.avatar" size="small"
-                        class="navbar-item"></el-avatar>
+                    <el-avatar :src="globalStore.userInfo.avatar" size="small" class="navbar-item">
+                        <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" /></el-avatar>
                 </div>
             </el-col>
         </el-row>

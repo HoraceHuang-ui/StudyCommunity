@@ -33,7 +33,6 @@ const userInfo = ref({
 	avatar: '',
 	cover: ''
 })
-const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
 
 onMounted(async () => {
 	try {
@@ -86,7 +85,8 @@ const posterClick = () => {
 	<el-card class="post-info-card">
 		<div class="card-header">
 			<div class="card-header-left" @click="posterClick">
-				<el-avatar size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
+				<el-avatar size="small" :src="userInfo.avatar" style="margin: 5px;"> <img
+						src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" /></el-avatar>
 				<div style="padding-top: 9px; margin-left: 5px; font-size: 13px;">{{ userInfo.name }}</div>
 			</div>
 			<el-button style="margin-right: 7px; font-size: 10px;" type="primary" plain @click="likeClick">点赞：{{
