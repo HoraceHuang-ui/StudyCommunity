@@ -12,7 +12,6 @@ import { useGlobalStore } from '../stores/global';
 const posts = ref([])
 
 const globalStore = useGlobalStore()
-
 const userInfo = computed(() => globalStore.userInfo)
 
 onMounted(async () => {
@@ -32,7 +31,6 @@ const newPostClick = () => {
 </script>
 
 <template>
-	<TopHeader />
 	<el-container>
 		<el-main class="main-width">
 			<el-button class="main-width" type="primary" :icon="Edit" plain @click="newPostClick">写一条动态…</el-button>

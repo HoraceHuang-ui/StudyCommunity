@@ -9,7 +9,6 @@ import { Token } from '../utils/storage'
 import { useGlobalStore } from '../stores/global'
 
 const globalStore = useGlobalStore()
-const { setUserInfo } = globalStore
 
 const imageUrl = ref('')
 const urlResp = ref('')
@@ -90,7 +89,7 @@ const login = async () => {
 			localStorage.setItem('token', _token)
 
 			const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
-			setUserInfo(userResp.obj);
+			globalStore.setUserInfo(userResp.obj);
 
 			router.push({
 				name: 'mainpage'
