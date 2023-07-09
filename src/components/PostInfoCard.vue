@@ -54,7 +54,7 @@ onMounted(async () => {
 const likeClick = async () => {
 	const data = {
 		postId: postInfo.value.postId,
-		likes: postInfo.value.likes * 1
+		likes: postInfo.value.likes * 1 + 1
 	}
 	console.log(data)
 	const headers = {
@@ -67,6 +67,10 @@ const likeClick = async () => {
 	// const likeResp = await axios.post('/api/post/likes/update?postId=' + data.postId + '&likes=' + data.likes, { headers })
 	console.log(likeResp)
 	postInfo.value.likes = likeResp.data.toString()
+}
+
+const imageClick = () => {
+	window.open(postInfo.value.image, "_blank", "noreferrer")
 }
 </script>
 
@@ -88,7 +92,8 @@ const likeClick = async () => {
 				<div class="separator"></div>
 			</div>
 			<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-			<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image" />
+			<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image"
+				@click="imageClick" />
 			<div class="body-detail">{{ postInfo.detail }} 正文省略正文省略正文省略正文省略正文省略正文省略正文省略
 				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
 				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略

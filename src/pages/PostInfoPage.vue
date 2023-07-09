@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 import PostInfoCard from '../components/PostInfoCard.vue'
+import TopHeader from '../components/TopHeader.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Token } from '../utils/storage';
 import { ApiGet, ApiPost } from '../utils/req'
 
 const route = useRoute()
-const router = useRouter()
 const postID = route.query.postId
 const comments = ref([])
 const commentSenders = ref([])
@@ -81,32 +81,16 @@ const sendComment = async () => {
 const getTimestamp = () => {
     const today = new Date();
     const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const time = today.getHours() + ":" +
+        (today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes() + ":")
+        + (today.getSeconds() < 10 ? "0" + today.getSeconds() : today.getSeconds());
     const timestamp = date + ' ' + time;
     return timestamp;
 }
 </script>
 
 <template>
-    <div class="navbar">
-        <el-row>
-            <el-col :span="12">
-                <div class="header-left">
-                    <div class="navbar-item">{{ userInfo.schoolId }}</div>
-                    <div class="navbar-item">{{ userInfo.clazzId }}</div>
-                    <el-tag class="navbar-item">{{ roles[userInfo.role - 1] }}</el-tag>
-                </div>
-            </el-col>
-            <el-col :span="12">
-                <div class="header-right">
-                    <el-dropdown class="navbar-item">{{ userInfo.name }}<el-icon
-                            class="el-icon--right"><arrow-down /></el-icon></el-dropdown>
-                    <!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-                    <el-avatar :src="userInfo.avatar" size="small" class="navbar-item"></el-avatar>
-                </div>
-            </el-col>
-        </el-row>
-    </div>
+    <TopHeader :userInfo="userInfo" :showBackButton="true" />
     <el-row>
         <el-col :span="12">
             <PostInfoCard :postId="postID"></PostInfoCard>
@@ -152,37 +136,9 @@ const getTimestamp = () => {
 </template>
 
 <style>
-.navbar {
-    position: sticky;
-    padding: 10px;
-    z-index: 2001;
-    top: 0px;
-    width: 100%;
-    left: 0px;
-    background-color: white;
-    /* 阴影  水平阴影距离，垂直阴影距离， 模糊尺寸， 阴影尺寸 颜色*/
-    box-shadow: 0 2px 4px 0 rgb(0, 0, 0, 10%);
-}
-
-.navbar-item {
-    margin: 0 5px 0 5px;
-}
-
 .main-width {
     width: 50%;
     min-width: 300px;
-}
-
-.header-left {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-}
-
-.header-right {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
 }
 
 .comments-area {

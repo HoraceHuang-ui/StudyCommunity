@@ -150,7 +150,7 @@ const cardClick = () => {
 	width: 80%;
 	max-width: 30vh;
 	max-height: 30vh;
-	border-radius: 10%;
+	border-radius: 20px;
 }
 
 .body-detail {

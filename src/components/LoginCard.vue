@@ -1,8 +1,164 @@
+<script setup >
+import { ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
+import { ApiPost } from '../utils/req'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { Token } from '../utils/storage'
+
+const imageUrl = ref('')
+const urlResp = ref('')
+const tempAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+const dialogTitle = ref('注册账号')
+
+const handleAvatarSuccess = (
+	response,
+	uploadFile
+) => {
+	imageUrl.value = URL.createObjectURL(uploadFile.raw)
+	urlResp.value = response.obj
+	ElMessage.info("请勿继续上传头像，谢谢配合！")
+}
+const beforeAvatarUpload = (rawFile) => {
+	if (rawFile.type !== 'image/jpeg') {
+		ElMessage.error('用户头像需为jpg格式')
+		return false
+	} else if (rawFile.size / 1024 / 1024 > 2) {
+		ElMessage.error('用户头像不可超过 2MB')
+		return false
+	}
+	return true
+}
+
+const router = useRouter()
+
+const step = ref(1)
+const regShow = ref(false)
+const pwd = ref('')
+const newUsername = ref('')
+const newPhone = ref('')
+const newPwd = ref('')
+const newSchool = ref('')
+const newClazz = ref('')
+const newSubj = ref('')
+const newChildID = ref('')
+const roles = [
+	{ id: 1, label: '班主任', desc: '班主任权限说明' },
+	{ id: 2, label: '教师', desc: '教师权限说明' },
+	{ id: 3, label: '家长', desc: '家长权限说明' },
+	{ id: 4, label: '学生', desc: '学生权限说明' },]
+const sexes = [
+	{ id: 1, label: "男" },
+	{ id: 2, label: "女" },]
+const role = ref(roles[0])
+const sex = ref(sexes[0])
+
+const forgotPwd = () => {
+	ElMessageBox.alert('请联系管理员找回')
+}
+
+const handleDialogClose = () => {
+	regShow.value = false
+	newUsername.value = ''
+	step.value = 1
+	dialogTitle.value = '注册账号'
+}
+
+const login = async () => {
+	try {
+		const data = {
+			username: newPhone.value,
+			password: pwd.value
+		}
+
+		// const _data = await ApiPost('/api/common/login', data)
+		const response = await axios.post('/api/common/login', data)
+		const _data = response.data
+
+		console.log(_data)
+
+		if (_data.code == 200) {
+			const _name = _data.obj.name
+			const _token = _data.obj.tokenHead + _data.obj.token
+			ElMessage.success(_name + '，您好！')
+
+			localStorage.setItem('token', _token)
+
+			router.push({
+				name: 'mainpage'
+			})
+		} else {
+			ElMessage.error(_data.message)
+		}
+	} catch (resp) {
+		console.log(resp)
+		ElMessage.error(resp.message || resp.data.message)
+	}
+}
+
+const register = async () => {
+	try {
+		const regData = {
+			username: newPhone.value,
+			name: newUsername.value,
+			clazzId: newClazz.value,
+			sex: sex.value.id,
+			role: role.value.id,
+			schoolId: newSchool.value,
+			password: newPwd.value,
+			// https://avatars.githubusercontent.com/u/67905897?v=4
+			avatar: tempAvatar,
+			cover: ref('bbb').value,
+			code: ref('000000').value
+		}
+
+		// const _data = await ApiPost('/common/register', regData)
+		const response = await axios.post('/api/common/register', regData)
+		console.log(response)
+		const _data = response.data
+
+		ElMessage.success(_data.message)
+		// const ret = _data.obj
+		// phone.value = ret.phonenum
+		dialogTitle.value = '上传头像'
+		step.value++
+	} catch (error) {
+		console.error(error)
+		ElMessage.error(error.message || error.data.message)
+	}
+}
+
+const upload = async (e) => {
+	var files = document.getElementById('uFile').value;
+	if (!/\.(jpg|jpeg|png)$/i.test(files)) {
+		ElMessage.warning("图片类型必须是jpeg,jpg,png中的一种,请重新上传")
+		return false;
+	}
+	let file = e.target.files[0]
+	let param = new FormData()
+	param.append('username', newPhone.value)
+	param.append('file', file)       // 通过append向form对象添加数据
+	let config = {
+		headers: { 'Content-Type': 'multipart/form-data' }
+	}
+	await axios.post("/api/common/register/upload", param, config).then((res) => {
+		if (res.data.code = 200) {
+			ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
+		} else {
+			ElMessage.warning("添加失败")
+		}
+	}).catch((err) => {
+		ElMessage.warning("图片上传失败，请重新上传!")
+	})
+}
+</script>
+
 <template>
 	<div>
 		<el-card class="login-card">
 			<el-row>
-				<el-col :span="24"><el-input v-model="phone" placeholder="手机号" /></el-col>
+				<el-col :span="24"><el-input v-model="newPhone" placeholder="手机号" /></el-col>
 			</el-row>
 			<div style="height: 20px;" />
 			<el-row style="display: flex; justify-content: space-between; align-items: center;">
@@ -15,7 +171,7 @@
 				<el-col :span="6"><el-button @click="login" type="primary">登录</el-button></el-col>
 			</el-row>
 		</el-card>
-		<el-dialog v-model="regShow" :before-close="handleDialogClose" title="注册账号" width="400px"
+		<el-dialog v-model="regShow" :before-close="handleDialogClose" :title="dialogTitle" width="400px"
 			style="max-height: 800px;">
 			<div v-if="step == 1">
 				<el-row>
@@ -101,7 +257,7 @@
 						<Plus />
 					</el-icon>
 				</el-upload> -->
-				<input style="width: 74px;" type="file" id="uFile" name="uFile" @change="upload($event)" />
+				<input style="width: 100%;" type="file" id="uFile" name="uFile" @change="upload($event)" />
 				<div style="height: 30px;" />
 			</div>
 
@@ -117,160 +273,6 @@
 		</el-dialog>
 	</div>
 </template>
-
-<script setup >
-import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
-import { ApiPost } from '../utils/req'
-import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { Token } from '../utils/storage'
-
-const imageUrl = ref('')
-const urlResp = ref('')
-const tempAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-
-const handleAvatarSuccess = (
-	response,
-	uploadFile
-) => {
-	imageUrl.value = URL.createObjectURL(uploadFile.raw)
-	urlResp.value = response.obj
-	ElMessage.info("请勿继续上传头像，谢谢配合！")
-}
-const beforeAvatarUpload = (rawFile) => {
-	if (rawFile.type !== 'image/jpeg') {
-		ElMessage.error('用户头像需为jpg格式')
-		return false
-	} else if (rawFile.size / 1024 / 1024 > 2) {
-		ElMessage.error('用户头像不可超过 2MB')
-		return false
-	}
-	return true
-}
-
-const router = useRouter()
-
-const step = ref(1)
-const regShow = ref(false)
-const phone = ref('')
-const pwd = ref('')
-const newUsername = ref('')
-const newPhone = ref('')
-const newPwd = ref('')
-const newSchool = ref('')
-const newClazz = ref('')
-const newSubj = ref('')
-const newChildID = ref('')
-const roles = [
-	{ id: 1, label: '班主任', desc: '班主任权限说明' },
-	{ id: 2, label: '教师', desc: '教师权限说明' },
-	{ id: 3, label: '家长', desc: '家长权限说明' },
-	{ id: 4, label: '学生', desc: '学生权限说明' },]
-const sexes = [
-	{ id: 1, label: "男" },
-	{ id: 2, label: "女" },]
-const role = ref(roles[0])
-const sex = ref(sexes[0])
-
-const forgotPwd = () => {
-	ElMessageBox.alert('请联系管理员找回')
-}
-
-const handleDialogClose = () => {
-	regShow.value = false
-	newUsername.value = ''
-	step.value = 1
-}
-
-const login = async () => {
-	try {
-		const data = {
-			username: phone.value,
-			password: pwd.value
-		}
-
-		// const _data = await ApiPost('/api/common/login', data)
-		const response = await axios.post('/api/common/login', data)
-		const _data = response.data
-
-		console.log(_data)
-
-		if (_data.code == 200) {
-			const _name = _data.obj.name
-			const _token = _data.obj.tokenHead + _data.obj.token
-			ElMessage.success(_name + '，您好！')
-
-			localStorage.setItem('token', _token)
-
-			router.push({
-				name: 'mainpage'
-			})
-		} else {
-			ElMessage.error(_data.message)
-		}
-	} catch (resp) {
-		console.log(resp)
-		ElMessage.error(resp.message || resp.data.message)
-	}
-}
-
-const register = async () => {
-	try {
-		const regData = {
-			username: newPhone.value,
-			name: newUsername.value,
-			clazzId: newClazz.value,
-			sex: sex.value.id,
-			role: role.value.id,
-			schoolId: newSchool.value,
-			password: newPwd.value,
-			// https://avatars.githubusercontent.com/u/67905897?v=4
-			avatar: tempAvatar,
-			cover: ref('bbb').value,
-			code: ref('000000').value
-		}
-
-		// const _data = await ApiPost('/common/register', regData)
-		const response = await axios.post('/api/common/register', regData)
-		console.log(response)
-		const _data = response.data
-
-		ElMessage.success(_data.message)
-		// const ret = _data.obj
-		// phone.value = ret.phonenum
-		step.value++
-	} catch (error) {
-		console.error(error)
-		ElMessage.error(error.message || error.data.message)
-	}
-}
-
-const upload = (e) => {
-	var files = document.getElementById('uFile').value;
-	if (!/\.(gif|jpg|jpeg|png|gif|jpg|png)$/i.test(files)) {
-		ElMessage.warning("图片类型必须是.gif,jpeg,jpg,png中的一种,请重新上传")
-		return false;
-	}
-	let file = e.target.files[0]
-	let param = new FormData()
-	param.append('username', newPhone.value)
-	param.append('file', file)       // 通过append向form对象添加数据
-	let config = {
-		headers: { 'Content-Type': 'multipart/form-data' }
-	}
-	axios.post("/api/common/register/upload", param, config).then((res) => {
-		if (res.data.code = 200) {
-			ElMessage.success("添加成功")  //需要引入element
-		} else {
-			ElMessage.warning("添加失败")
-		}
-	}).catch((err) => {
-		ElMessage.warning("图片上传失败，请重新上传!")
-	})
-}
-</script>
 
 <style scoped>
 .avatar-uploader .avatar {
