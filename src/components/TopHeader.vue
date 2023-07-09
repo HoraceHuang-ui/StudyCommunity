@@ -3,15 +3,17 @@ import { useRouter } from 'vue-router'
 import { ArrowLeftBold, House, ArrowDown } from '@element-plus/icons-vue'
 import { ApiGet } from '../utils/req'
 import { ref, onMounted, watch } from 'vue'
-import { useGlobalStore } from '../stores/global';
 import { Token } from '../utils/storage';
+import { useGlobalStore } from '../stores/global';
 const props = defineProps({
     showBackButton: Boolean,
 })
 
+const router = useRouter()
+const globalStore = useGlobalStore()
+
 const roles = ['班主任', '老师', '家长', '学生']
 
-const router = useRouter()
 const backClick = () => {
     router.go(-1)
 }
@@ -33,17 +35,6 @@ const avatarClick = () => {
         }
     })
 }
-
-const globalStore = useGlobalStore()
-const { setUserInfo } = globalStore
-
-onMounted(async () => {
-    if (globalStore.userInfo.name === "") {
-        // First fetch
-        const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
-        setUserInfo(userResp.obj);
-    }
-})
 </script>
 
 <template>
