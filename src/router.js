@@ -3,6 +3,7 @@ import MainPage from "./pages/MainPage.vue";
 import LoginPage from "./pages/LoginPage.vue";
 import PostInfoPage from "./pages/PostInfoPage.vue";
 import PostEditPage from "./pages/PostEditPage.vue";
+import PersonPostsPage from "./pages/PersonPostsPage.vue";
 
 // const originalPush = VueRouter.prototype.push
 // VueRouter.prototype.push = function push(location) {
@@ -31,6 +32,11 @@ const router = VueRouter.createRouter({
       name: "postedit",
       path: "/postedit",
       component: PostEditPage,
+    },
+    {
+      name: "personposts",
+      path: "/personposts",
+      component: PersonPostsPage,
     },
   ],
 });

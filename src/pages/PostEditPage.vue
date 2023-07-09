@@ -8,21 +8,15 @@ import { ApiGet, ApiPost } from '../utils/req';
 import { Token } from '../utils/storage';
 import { Edit } from '@element-plus/icons-vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useGlobalStore } from '../stores/global'
 
 const editTitle = ref('')
 const editDetail = ref('')
 const editImage = ref('')
 const editPostId = ref('')
-const userInfo = ref({
-    username: '',
-    name: '',
-    clazzId: '',
-    schoolId: '',
-    sex: '',
-    role: '',
-    avatar: '',
-    cover: ''
-})
+const globalStore = useGlobalStore()
+
+const userInfo = computed(() => globalStore.userInfo)
 
 const upload = async (e) => {
     var files = document.getElementById('uFile').value;
@@ -32,7 +26,7 @@ const upload = async (e) => {
     }
     let file = e.target.files[0]
     let param = new FormData()
-    param.append('postId', '')
+    param.append('postId', editPostId.value)
     param.append('file', file)       // 通过append向form对象添加数据
     let config = {
         headers: {
@@ -40,8 +34,8 @@ const upload = async (e) => {
             Authorization: Token.getToken()
         }
     }
-    await axios.post("/api/post/file/save", param, config).then((res) => {
-        console.log(res)
+    await axios.post("/api/post/file/update", param, config).then((res) => {
+        // console.log(res)
         if (res.data.code = 200) {
             ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
             editImage.value = res.data.obj[0]
@@ -67,22 +61,28 @@ const sendClick = async () => {
         clazzId: userInfo.value.clazzId,
         likes: 0
     }
-    console.log(data)
-    // const sendResp = await ApiPost('post/save', data)
+
     const headers = {
         'Content-Type': 'application/json',
         Authorization: Token.getToken()
     }
-    const sendResp = await axios.post('/api/post/save', data, { headers })
-    console.log(sendResp)
-    // router.go(-1)
+    const sendResp = await axios.post('/api/post/update', data, { headers })
+    // console.log(sendResp)
+    router.go(-1)
 }
 
 const route = useRoute()
 onMounted(async () => {
-    const userResp = await ApiGet('getUserinfoById?username=' + route.query.userId)
-    console.log(userResp)
-    userInfo.value = userResp.obj
+    if (route.query.postId && route.query.postId != '') {
+        editPostId.value = route.query.postId
+        const postResp = await ApiGet('post/get?postId=' + editPostId.value)
+        // console.log(postResp)
+
+        editPostId.value = postResp.obj.postId
+        editTitle.value = postResp.obj.title
+        editDetail.value = postResp.obj.detail
+        editImage.value = postResp.obj.image
+    }
 })
 
 const getTimestamp = () => {
@@ -91,13 +91,13 @@ const getTimestamp = () => {
     const time = today.getHours() + ":" +
         (today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes() + ":")
         + (today.getSeconds() < 10 ? "0" + today.getSeconds() : today.getSeconds());
-    const timestamp = date + ' ' + time;
-    return timestamp;
+    const timestamp = date + ' ' + time
+    return timestamp
 }
 </script>
 
 <template>
-    <TopHeader :showBackButton="true" :userInfo="userInfo" />
+    <TopHeader :showBackButton="true" />
     <div class="col-container">
         <el-button class="main-width" type="primary" :icon="Promotion" plain @click="sendClick"
             style="margin-top: 20px;">发布</el-button>
@@ -107,6 +107,8 @@ const getTimestamp = () => {
         <el-input class="main-width" v-model="editDetail" placeholder="输入正文…" :autosize="{ minRows: 3 }" type="textarea" />
         <div class="main-width" style="margin-top: 10px; text-align: left;">上传图片：</div>
         <input class="main-width" style="margin-top: 10px;" type="file" id="uFile" name="uFile" @change="upload($event)" />
+        <el-image v-if="editImage != ''" class="main-width" style="margin-top: 10px; border-radius: 20px;"
+            :src="editImage"></el-image>
     </div>
     <el-backtop />
 </template>

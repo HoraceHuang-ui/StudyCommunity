@@ -4,7 +4,7 @@ import { Token } from "./storage";
 const baseUrl = "/api";
 const instance = axios.create({
   baseURL: baseUrl,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 instance.interceptors.request.use((config) => {
@@ -23,7 +23,7 @@ instance.interceptors.response.use(
     }
   },
   (err) => {
-    console.log(err.response);
+    // console.log(err.response);
     return Promise.reject(err);
   }
 );

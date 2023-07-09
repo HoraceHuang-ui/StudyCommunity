@@ -1,34 +1,54 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ArrowLeftBold } from '@element-plus/icons-vue'
+import { ArrowLeftBold, House, ArrowDown } from '@element-plus/icons-vue'
 import { ApiGet } from '../utils/req'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useGlobalStore } from '../stores/global';
+import { Token } from '../utils/storage';
 const props = defineProps({
-    userInfo: {
-        username: String,
-        name: String,
-        clazzId: String,
-        schoolId: String,
-        sex: String,
-        role: String,
-        avatar: String,
-        cover: String
-    },
-    showBackButton: Boolean
+    showBackButton: Boolean,
 })
 
 const roles = ['班主任', '老师', '家长', '学生']
 
 const router = useRouter()
-
 const backClick = () => {
     router.go(-1)
 }
+const homeClick = () => {
+    router.push({
+        name: "mainpage"
+    })
+}
+const logoutClick = () => {
+    router.push({
+        name: "login"
+    })
+}
+const avatarClick = () => {
+    router.push({
+        name: "personposts",
+        query: {
+            userId: props.userInfo.username
+        }
+    })
+}
+
+const globalStore = useGlobalStore()
+const { setUserInfo } = globalStore
+
+onMounted(async () => {
+    if (globalStore.userInfo.name === "") {
+        // First fetch
+        const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
+        setUserInfo(userResp.obj);
+    }
+})
 </script>
 
 <template>
     <div class="navbar">
-        <el-row v-if="props.userInfo != null">
+        <el-row v-if="globalStore.userInfo != null">
             <el-col :span="12">
                 <div class="navbar-left">
                     <button class="navbar-item navbar-button" v-if="showBackButton" @click="backClick">
@@ -36,17 +56,34 @@ const backClick = () => {
                             <ArrowLeftBold />
                         </el-icon>
                     </button>
-                    <div class="navbar-item">{{ props.userInfo.schoolId }}</div>
-                    <div class="navbar-item">{{ props.userInfo.clazzId }}</div>
-                    <el-tag class="navbar-item">{{ roles[props.userInfo.role - 1] }}</el-tag>
+                    <button class="navbar-item navbar-button" v-if="showBackButton" @click="homeClick">
+                        <el-icon>
+                            <House />
+                        </el-icon>
+                    </button>
+                    <div class="navbar-item">{{ globalStore.userInfo.schoolId }}</div>
+                    <div class="navbar-item">{{ globalStore.userInfo.clazzId }}</div>
+                    <el-tag class="navbar-item">{{ roles[globalStore.userInfo.role - 1] }}</el-tag>
                 </div>
             </el-col>
             <el-col :span="12">
                 <div class="navbar-right">
-                    <el-dropdown class="navbar-item">{{ props.userInfo.name }}<el-icon
-                            class="el-icon--right"><arrow-down /></el-icon></el-dropdown>
+                    <el-dropdown class="navbar-item" style="height: 100%;">
+                        <span>
+                            {{ globalStore.userInfo.name }}
+                            <el-icon class="el-icon--right">
+                                <ArrowDown />
+                            </el-icon>
+                        </span>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="logoutClick">登出</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                     <!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-                    <el-avatar :src="props.userInfo.avatar" size="small" class="navbar-item"></el-avatar>
+                    <el-avatar @click="avatarClick" :src="globalStore.userInfo.avatar" size="small"
+                        class="navbar-item"></el-avatar>
                 </div>
             </el-col>
         </el-row>

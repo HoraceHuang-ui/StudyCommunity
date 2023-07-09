@@ -1,26 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import PostInfoCard from '../components/PostInfoCard.vue'
 import TopHeader from '../components/TopHeader.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Token } from '../utils/storage';
 import { ApiGet, ApiPost } from '../utils/req'
+import { useGlobalStore } from '../stores/global';
 
 const route = useRoute()
 const postID = route.query.postId
 const comments = ref([])
 const commentSenders = ref([])
 
-const userInfo = ref({
-    username: '',
-    name: '',
-    clazzId: '',
-    schoolId: '',
-    sex: '',
-    role: '',
-    avatar: '',
-    cover: ''
-})
+const globalStore = useGlobalStore()
+
+const userInfo = computed(() => globalStore.userInfo)
 const commentToSend = ref({
     commentId: '',
     postId: '',
@@ -34,18 +28,20 @@ const commentToId = ref('')  // empty: to post
 
 onMounted(async () => {
     try {
-        const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
-        console.log(userResp)
-        userInfo.value = userResp.obj
-
         const commsResp = await ApiGet('comment/get?postId=' + postID)
-        console.log(commsResp)
+        // console.log(commsResp)
         comments.value = commsResp.obj
 
         for (let i = 0; i < comments.value.length; i++) {
             const comment = comments.value[i]
-            const commUserResp = await ApiGet('getUserinfoById?username=' + comment.username)
-            commentSenders.value.push(commUserResp.obj)
+            const commentSenderItem = globalStore.userCache[comment.username]
+            if (!commentSenderItem) {
+                const commUserResp = await ApiGet('getUserinfoById?username=' + comment.username)
+                commentSenders.value.push(commUserResp.obj)
+                globalStore.addUserCache(commUserResp.obj)
+            } else {
+                commentSenders.value.push(commentSenderItem)
+            }
         }
     } catch (error) {
         console.error(error);
@@ -55,27 +51,37 @@ onMounted(async () => {
 const sendComment = async () => {
     commentToSend.value.detail = commentText.value
     commentToSend.value.postId = postID
-    console.log('comment on ' + postID)
+    // console.log('comment on ' + postID)
     commentToSend.value.username = userInfo.value.username
     if (commentToId.value != '') commentToSend.value.commentId = commentToId.value
     else commentToSend.value.commentId = null
     commentToSend.value.postTime = getTimestamp()
 
     const commResp = await ApiPost('comment/save', commentToSend.value)
-    console.log(commResp)
+    // console.log(commResp)
 
     commentToId.value = ''
-    location.reload()
+    router.go(0)
+}
+
+const router = useRouter()
+const commentAvatarClick = (index) => {
+    router.push({
+        name: "personposts",
+        query: {
+            userId: commentSenders.value[index].userId
+        }
+    })
 }
 
 // let curComment = 0
 // const initComment = async (comment) => {
-//     console.log('comment init' + comment.username)
+//     // console.log('comment init' + comment.username)
 //     const userResp = await ApiGet('getUserinfoById?username=' + comment.username)
 //     curComment++
-//     console.log(userResp)
+//     // console.log(userResp)
 //     commentSenders.value.push(userResp.obj)
-//     console.log(userResp.obj)
+//     // console.log(userResp.obj)
 // }
 
 const getTimestamp = () => {
@@ -90,7 +96,7 @@ const getTimestamp = () => {
 </script>
 
 <template>
-    <TopHeader :userInfo="userInfo" :showBackButton="true" />
+    <TopHeader :showBackButton="true" />
     <el-row>
         <el-col :span="12">
             <PostInfoCard :postId="postID"></PostInfoCard>
@@ -101,7 +107,8 @@ const getTimestamp = () => {
                     <el-row class="comment-block">
                         <el-col :span="5">
                             <div class="comment-block-left">
-                                <el-avatar v-if="commentSenders[index]" size="large" :src="commentSenders[index].avatar" />
+                                <el-avatar v-if="commentSenders[index]" @click="commentAvatarClick(index)" size="large"
+                                    :src="commentSenders[index].avatar" />
                             </div>
                         </el-col>
                         <el-col :span="19" style="comment-block-right">

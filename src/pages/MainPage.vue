@@ -2,35 +2,22 @@
 import MainPostCard from '../components/MainPostCard.vue'
 import TopHeader from '../components/TopHeader.vue'
 import axios from 'axios'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ApiGet } from '../utils/req';
 import { Token } from '../utils/storage';
 import { Edit } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useGlobalStore } from '../stores/global';
 
 const posts = ref([])
 
-const userInfo = ref({
-	username: '',
-	name: '',
-	clazzId: '',
-	schoolId: '',
-	sex: '',
-	role: '',
-	avatar: '',
-	cover: ''
-})
+const globalStore = useGlobalStore()
+
+const userInfo = computed(() => globalStore.userInfo)
 
 onMounted(async () => {
 	const postsResp = await ApiGet('home?token=' + Token.getToken())
-	// const resp = await axios.get('/api/home?token=' + data.token)
-	console.log(postsResp)
 	posts.value = postsResp.obj
-	console.log(posts.value)
-
-	const userResp = await ApiGet('getUserinfoByToken?token=' + Token.getToken())
-	console.log(userResp)
-	userInfo.value = userResp.obj
 })
 
 const router = useRouter()
@@ -45,9 +32,9 @@ const newPostClick = () => {
 </script>
 
 <template>
-	<TopHeader :userInfo="userInfo" />
+	<TopHeader />
 	<el-container>
-		<el-main>
+		<el-main class="main-width">
 			<el-button class="main-width" type="primary" :icon="Edit" plain @click="newPostClick">写一条动态…</el-button>
 			<li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
 				<MainPostCard :postID="post.postId" class="post-card"></MainPostCard>

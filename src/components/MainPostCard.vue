@@ -3,10 +3,18 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { ApiGet } from '../utils/req'
 import { useRouter } from 'vue-router'
+import { Edit, Delete, User } from '@element-plus/icons-vue'
+import { Token } from '../utils/storage'
+import { useGlobalStore } from '../stores/global'
+
+const globalStore = useGlobalStore()
 
 const props = defineProps({
-	postID: String
+	postID: String,
+	visitUserId: String
 })
+const showDelete = ref(false)
+const showEdit = ref(false)
 
 const postInfo = ref({
 	username: '',
@@ -29,24 +37,58 @@ const userInfo = ref({
 	avatar: '',
 	cover: ''
 })
-const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
+const roles = ['班主任', '老师', '家长', '学生']
+// const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
 
 onMounted(async () => {
 	try {
 		const postResp = await ApiGet('post/get?postId=' + props.postID)
-		// const response = await axios.get('/api/post/get', { postId: props.postID })
-		console.log(postResp)
 		postInfo.value = postResp.obj
 
-		const userResp = await ApiGet('getUserinfoById?username=' + postInfo.value.username)
-		console.log(userResp)
-		userInfo.value = userResp.obj
+		const userItem = globalStore.userCache[postInfo.value.username]
+		if (!userItem) {
+			const userResp = await ApiGet('getUserinfoById?username=' + postInfo.value.username)
+			globalStore.addUserCache(userResp.obj)
+			userInfo.value = userResp.obj
+		} else {
+			userInfo.value = userItem
+		}
+
+		showDelete.value = (globalStore.userInfo.username === userInfo.value.username) || globalStore.userInfo.role === '1'
+		showEdit.value = globalStore.userInfo.username === userInfo.value.username
 	} catch (error) {
 		console.error(error);
 	}
 })
 
 const router = useRouter()
+const editClick = () => {
+	router.push({
+		name: "postedit",
+		query: {
+			postId: props.postID
+		}
+	})
+}
+const delClick = async () => {
+	const headers = {
+		'Content-Type': 'application/json',
+		Authorization: Token.getToken()
+	}
+	console.log('props.postID = ' + props.postID)
+	const delResp = await axios.delete('/api/post/delete?postId=' + props.postID, { headers })
+	console.log(delResp)
+	router.go(0)
+}
+const userClick = () => {
+	router.push({
+		name: "personposts",
+		query: {
+			userId: postInfo.value.username
+		}
+	})
+}
+
 const cardClick = () => {
 	router.push({
 		name: 'postinfo',
@@ -58,27 +100,43 @@ const cardClick = () => {
 </script>
 
 <template>
-	<el-card class="main-width post-card" @click="cardClick" shadow="hover" :body-style="{ padding: '10px' }">
-		<div class="card-header">
-			<div class="card-header-left">
-				<el-avatar v-if="!userInfo.avatar || userInfo.avatar == ''" size="small" :src="this.tempAvatar"
-					style="margin: 5px;"></el-avatar>
-				<el-avatar v-else size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
-				<div style="padding-top: 9px; margin-left: 5px; font-size: 10px;">{{ userInfo.name }}</div>
+	<div style="display: flex; flex-direction: row;">
+		<div style="width: 20px;"></div>
+		<el-card class="main-width" @click="cardClick" shadow="hover" :body-style="{ padding: '10px' }">
+			<div class="card-header">
+				<div class="card-header-left">
+					<el-avatar v-if="!userInfo.avatar || userInfo.avatar == ''" size="small" :src="this.tempAvatar"
+						style="margin: 5px;"></el-avatar>
+					<el-avatar v-else size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
+					<div style="padding-top: 9px; margin-left: 5px; font-size: 10px;">
+						{{ userInfo.name }}
+						<el-tag style="margin-left: 5px;">{{ roles[userInfo.role - 1] }}</el-tag>
+					</div>
+				</div>
+				<div style="margin-top: 9px; margin-right: 7px; font-size: 10px;">点赞：{{ postInfo.likes }}</div>
 			</div>
-			<div style="margin-top: 9px; margin-right: 7px; font-size: 10px;">点赞：{{ postInfo.likes }}</div>
+			<div class="body-title">
+				<div class="info-title">{{ postInfo.title }}</div>
+				<div class="info-time">{{ postInfo.postTime }}</div>
+				<div class="separator"></div>
+			</div>
+			<div class="detail-block"></div>
+			<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
+			<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image" />
+			<div class="body-detail">{{ postInfo.detail }}</div>
+		</el-card>
+		<div style="display: flex; flex-direction: column; margin-left: 10px;">
+			<el-icon @click="userClick" style="margin-top: 10px;">
+				<User />
+			</el-icon>
+			<el-icon v-if="showEdit" @click="editClick" style="margin-top: 10px;">
+				<Edit />
+			</el-icon>
+			<el-icon v-if="showDelete" @click="delClick" style="margin-top: 10px;">
+				<Delete />
+			</el-icon>
 		</div>
-		<div class="body-title">
-			<div class="info-title">{{ postInfo.title }} 标题省略标题省略标题省略</div>
-			<div class="info-time">{{ postInfo.postTime }}</div>
-			<div class="separator"></div>
-		</div>
-		<div class="detail-block"></div>
-		<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
-		<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image" />
-		<div class="body-detail">{{ postInfo.detail }} 正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-			正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略</div>
-	</el-card>
+	</div>
 </template>
 
 <style scoped>
@@ -98,14 +156,6 @@ const cardClick = () => {
 	display: flex;
 	flex-direction: row;
 	align-content: flex-start;
-}
-
-.text {
-	font-size: 14px;
-}
-
-.item {
-	margin-bottom: 18px;
 }
 
 .post-card {

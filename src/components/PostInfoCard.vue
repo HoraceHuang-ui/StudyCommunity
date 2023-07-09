@@ -4,10 +4,13 @@ import axios from 'axios'
 import { ApiGet, ApiPost } from '../utils/req'
 import { useRouter } from 'vue-router'
 import { Token } from '../utils/storage';
+import { useGlobalStore } from '../stores/global';
 
 const props = defineProps({
 	postId: String
 })
+
+const globalStore = useGlobalStore()
 
 const postInfo = ref({
 	username: '',
@@ -35,17 +38,16 @@ const tempAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c672
 onMounted(async () => {
 	try {
 		const postResp = await ApiGet('post/get?postId=' + props.postId)
-		// const response = await axios.get('/api/post/get', { postId: props.postID })
-		console.log(postResp)
 		postInfo.value = postResp.obj
 
-		const userResp = await ApiGet('getUserinfoById?username=' + postInfo.value.username)
-		console.log(userResp)
-		userInfo.value = userResp.obj
-
-		// postInfo.value.title = 'changed'
-		// temp
-		// const delResp = await axios.delete('/api/post/update', postInfo.value)
+		const userItem = globalStore.userCache[postInfo.value.username]
+		if (!userItem) {
+			const userResp = await ApiGet('getUserinfoById?username=' + postInfo.value.username)
+			globalStore.addUserCache(userResp.obj)
+			userInfo.value = userResp.obj
+		} else {
+			userInfo.value = userItem
+		}
 	} catch (error) {
 		console.error(error);
 	}
@@ -56,28 +58,34 @@ const likeClick = async () => {
 		postId: postInfo.value.postId,
 		likes: postInfo.value.likes * 1 + 1
 	}
-	console.log(data)
+	// console.log(data)
 	const headers = {
 		'Content-Type': 'application/json',
 		Authorization: Token.getToken()
 	}
-	// const likeResp = await ApiPost('post/likes/update', data)
 	const likeResp = await axios.put('/api/post/likes/update', data, { headers })
-	// const likeResp = await axios.post('/api/post/likes/update', data, { headers })
-	// const likeResp = await axios.post('/api/post/likes/update?postId=' + data.postId + '&likes=' + data.likes, { headers })
-	console.log(likeResp)
 	postInfo.value.likes = likeResp.data.toString()
 }
 
 const imageClick = () => {
 	window.open(postInfo.value.image, "_blank", "noreferrer")
 }
+
+const router = useRouter()
+const posterClick = () => {
+	router.push({
+		name: 'personposts',
+		query: {
+			userId: userInfo.value.username
+		}
+	})
+}
 </script>
 
 <template>
 	<el-card class="post-info-card">
 		<div class="card-header">
-			<div class="card-header-left">
+			<div class="card-header-left" @click="posterClick">
 				<el-avatar size="small" :src="userInfo.avatar" style="margin: 5px;"></el-avatar>
 				<div style="padding-top: 9px; margin-left: 5px; font-size: 13px;">{{ userInfo.name }}</div>
 			</div>
@@ -86,24 +94,14 @@ const imageClick = () => {
 		</div>
 		<el-scrollbar class="body-title" height="84vh">
 			<div>
-				<div class="info-title">{{ postInfo.title }} 标题省略标题省略标题省略
-					标题省略标题省略标题省略标题省略标题省略标题省略标题省略标题省略end</div>
+				<div class="info-title">{{ postInfo.title }}</div>
 				<div class="info-time">{{ postInfo.postTime }}</div>
 				<div class="separator"></div>
 			</div>
 			<!-- https://avatars.githubusercontent.com/u/67905897?v=4 -->
 			<el-image v-if="postInfo.image && postInfo.image != ''" :src="postInfo.image" class="body-image"
 				@click="imageClick" />
-			<div class="body-detail">{{ postInfo.detail }} 正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略11正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文22省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略
-				正文省略正文省略正文省略正文省略正文省略正文省略正文省略正文省略33正文省略正文省略正文省略正文省略正文省略正文省略end
-			</div>
+			<div class="body-detail">{{ postInfo.detail }}</div>
 			<div style="height: 5vh;"></div>
 		</el-scrollbar>
 	</el-card>

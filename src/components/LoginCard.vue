@@ -76,7 +76,7 @@ const login = async () => {
 		const response = await axios.post('/api/common/login', data)
 		const _data = response.data
 
-		console.log(_data)
+		// console.log(_data)
 
 		if (_data.code == 200) {
 			const _name = _data.obj.name
@@ -92,7 +92,7 @@ const login = async () => {
 			ElMessage.error(_data.message)
 		}
 	} catch (resp) {
-		console.log(resp)
+		// console.log(resp)
 		ElMessage.error(resp.message || resp.data.message)
 	}
 }
@@ -115,7 +115,7 @@ const register = async () => {
 
 		// const _data = await ApiPost('/common/register', regData)
 		const response = await axios.post('/api/common/register', regData)
-		console.log(response)
+		// console.log(response)
 		const _data = response.data
 
 		ElMessage.success(_data.message)
