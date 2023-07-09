@@ -75,11 +75,8 @@ const login = async () => {
 			password: pwd.value
 		}
 
-		// const _data = await ApiPost('/api/common/login', data)
 		const response = await axios.post('/api/common/login', data)
 		const _data = response.data
-
-		// console.log(_data)
 
 		if (_data.code == 200) {
 			const _name = _data.obj.name
@@ -98,7 +95,6 @@ const login = async () => {
 			ElMessage.error(_data.message)
 		}
 	} catch (resp) {
-		// console.log(resp)
 		ElMessage.error(resp.message || resp.data.message)
 	}
 }
@@ -113,20 +109,15 @@ const register = async () => {
 			role: role.value.id,
 			schoolId: newSchool.value,
 			password: newPwd.value,
-			// https://avatars.githubusercontent.com/u/67905897?v=4
 			avatar: tempAvatar,
 			cover: ref('bbb').value,
 			code: ref('000000').value
 		}
 
-		// const _data = await ApiPost('/common/register', regData)
 		const response = await axios.post('/api/common/register', regData)
-		// console.log(response)
 		const _data = response.data
 
 		ElMessage.success(_data.message)
-		// const ret = _data.obj
-		// phone.value = ret.phonenum
 		dialogTitle.value = '上传头像'
 		step.value++
 	} catch (error) {
@@ -144,7 +135,7 @@ const upload = async (e) => {
 	let file = e.target.files[0]
 	let param = new FormData()
 	param.append('username', newPhone.value)
-	param.append('file', file)       // 通过append向form对象添加数据
+	param.append('file', file)
 	let config = {
 		headers: { 'Content-Type': 'multipart/form-data' }
 	}
@@ -164,7 +155,7 @@ const upload = async (e) => {
 	<div>
 		<el-card class="login-card">
 			<el-row>
-				<el-col :span="24"><el-input v-model="newPhone" placeholder="手机号" /></el-col>
+				<el-col :span="24"><el-input v-model="newPhone" placeholder="用户名" /></el-col>
 			</el-row>
 			<div style="height: 20px;" />
 			<el-row style="display: flex; justify-content: space-between; align-items: center;">

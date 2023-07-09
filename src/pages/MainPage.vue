@@ -33,11 +33,13 @@ const newPostClick = () => {
 <template>
 	<TopHeader />
 	<el-container>
-		<el-main class="main-width">
+		<el-main class="cards-list">
 			<el-button class="main-width" type="primary" :icon="Edit" plain @click="newPostClick">写一条动态…</el-button>
-			<li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
-				<MainPostCard :postID="post.postId" class="post-card"></MainPostCard>
-			</li>
+			<div class="main-width" style="margin: 0 auto;">
+				<div class="card-item" v-if="posts.length != 0" v-for="post in posts" :key="post.postId">
+					<MainPostCard :postID="post.postId" class="post-card"></MainPostCard>
+				</div>
+			</div>
 			<div v-if="posts.length == 0" class="no-post">
 				当前班级暂无动态
 			</div>
@@ -52,7 +54,7 @@ const newPostClick = () => {
 	min-width: 300px;
 }
 
-.cards-list {
+.card-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -61,6 +63,7 @@ const newPostClick = () => {
 
 .post-card {
 	margin: 5px;
+	width: 100%;
 }
 
 .no-post {

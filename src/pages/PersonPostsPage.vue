@@ -61,9 +61,11 @@ const newPostClick = () => {
     <el-container>
         <el-main>
             <div>您正在浏览 {{ thatUserInfo.name }} <el-tag>{{ roles[thatUserInfo.role - 1] }}</el-tag> 的动态</div>
-            <li v-if="posts.length != 0" v-for="post in posts" class="cards-list">
-                <MainPostCard :postID="post.postId" :visitUserId="userInfo.username" class="post-card"></MainPostCard>
-            </li>
+            <div class="main-width" style="margin: 0 auto;">
+                <div v-if="posts.length != 0" v-for="post in posts" class="cards-list">
+                    <MainPostCard :postID="post.postId" :visitUserId="userInfo.username" class="post-card"></MainPostCard>
+                </div>
+            </div>
             <div v-if="posts.length == 0" class="no-post">
                 当前用户暂无动态
             </div>
@@ -87,6 +89,7 @@ const newPostClick = () => {
 
 .post-card {
     margin: 5px;
+    width: 100%
 }
 
 .no-post {

@@ -29,7 +29,6 @@ const commentToId = ref('')  // empty: to post
 onMounted(async () => {
     try {
         const commsResp = await ApiGet('comment/get?postId=' + postID)
-        // console.log(commsResp)
         comments.value = commsResp.obj
 
         for (let i = 0; i < comments.value.length; i++) {
@@ -51,13 +50,12 @@ onMounted(async () => {
 const sendComment = async () => {
     commentToSend.value.detail = commentText.value
     commentToSend.value.postId = postID
-    // console.log('comment on ' + postID)
     commentToSend.value.username = userInfo.value.username
     if (commentToId.value != '') commentToSend.value.commentId = commentToId.value
     else commentToSend.value.commentId = null
     commentToSend.value.postTime = getTimestamp()
 
-    const commResp = await ApiPost('comment/save', commentToSend.value)
+    await ApiPost('comment/save', commentToSend.value)
 
     commentToId.value = ''
     router.go(0)

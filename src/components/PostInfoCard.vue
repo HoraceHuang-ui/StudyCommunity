@@ -57,7 +57,6 @@ const likeClick = async () => {
 		postId: postInfo.value.postId,
 		likes: postInfo.value.likes * 1 + 1
 	}
-	// console.log(data)
 	const headers = {
 		'Content-Type': 'application/json',
 		Authorization: Token.getToken()

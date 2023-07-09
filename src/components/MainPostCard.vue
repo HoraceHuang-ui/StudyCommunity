@@ -100,7 +100,7 @@ const cardClick = () => {
 
 <template>
 	<div style="display: flex; flex-direction: row;">
-		<div style="width: 20px;"></div>
+		<div style="width: 30px;"></div>
 		<el-card class="main-width" @click="cardClick" shadow="hover" :body-style="{ padding: '10px' }">
 			<div class="card-header">
 				<div class="card-header-left">
@@ -139,7 +139,7 @@ const cardClick = () => {
 
 <style scoped>
 .main-width {
-	width: 50%;
+	width: 100%;
 	min-width: 300px;
 }
 

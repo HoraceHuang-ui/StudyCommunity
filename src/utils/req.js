@@ -15,7 +15,6 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use(
   (resp) => {
     if (resp.data && resp.data.code === 200) {
-      // success
       return resp.data;
     } else {
       console.error(resp.data.message);
@@ -23,7 +22,6 @@ instance.interceptors.response.use(
     }
   },
   (err) => {
-    // console.log(err.response);
     return Promise.reject(err);
   }
 );

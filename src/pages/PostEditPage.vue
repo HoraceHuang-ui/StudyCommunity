@@ -27,7 +27,7 @@ const upload = async (e) => {
     let file = e.target.files[0]
     let param = new FormData()
     param.append('postId', editPostId.value)
-    param.append('file', file)       // 通过append向form对象添加数据
+    param.append('file', file)
     let config = {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -35,7 +35,6 @@ const upload = async (e) => {
         }
     }
     await axios.post("/api/post/file/update", param, config).then((res) => {
-        // console.log(res)
         if (res.data.code = 200) {
             ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
             editImage.value = res.data.obj[0]
@@ -66,8 +65,13 @@ const sendClick = async () => {
         'Content-Type': 'application/json',
         Authorization: Token.getToken()
     }
-    const sendResp = await axios.post('/api/post/update', data, { headers })
-    // console.log(sendResp)
+
+    if (editPostId.value == '') {
+        await ApiPost('post/save', data)
+    } else {
+        // update post
+        await axios.put('/api/post/update', data, { headers })
+    }
     router.go(-1)
 }
 
@@ -76,7 +80,6 @@ onMounted(async () => {
     if (route.query.postId && route.query.postId != '') {
         editPostId.value = route.query.postId
         const postResp = await ApiGet('post/get?postId=' + editPostId.value)
-        // console.log(postResp)
 
         editPostId.value = postResp.obj.postId
         editTitle.value = postResp.obj.title

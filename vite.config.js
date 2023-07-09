@@ -1,11 +1,9 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   server: {
-    // set a proxy to backend entry point
     proxy: {
       "/api": {
         // 1.117.52.175
