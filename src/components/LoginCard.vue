@@ -180,7 +180,7 @@ const upload = async (e) => {
 				<div style="height: 10px;" />
 				<el-row>
 					<el-col :span="1"></el-col>
-					<el-col :span="23"><el-input v-model="newPhone" placeholder="手机号"></el-input></el-col>
+					<el-col :span="23"><el-input v-model="newPhone" placeholder="用户名"></el-input></el-col>
 				</el-row>
 				<div style="height: 10px;" />
 				<el-row>

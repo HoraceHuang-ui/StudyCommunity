@@ -34,7 +34,7 @@ const upload = async (e) => {
             Authorization: Token.getToken()
         }
     }
-    await axios.post("/api/post/file/update", param, config).then((res) => {
+    await axios.post(editPostId.value == '' ? "/api/post/file/save" : "/api/post/file/update", param, config).then((res) => {
         if (res.data.code = 200) {
             ElMessage.success("上传成功，请勿继续上传，谢谢配合！")
             editImage.value = res.data.obj[0]
@@ -108,6 +108,7 @@ const getTimestamp = () => {
             type="textarea" />
         <div style="height: 10px;"></div>
         <el-input class="main-width" v-model="editDetail" placeholder="输入正文…" :autosize="{ minRows: 3 }" type="textarea" />
+        <div class="main-width word-count-text">字数：{{ editDetail.length }} / 9999</div>
         <div class="main-width" style="margin-top: 10px; text-align: left;">上传图片：</div>
         <input class="main-width" style="margin-top: 10px;" type="file" id="uFile" name="uFile" @change="upload($event)" />
         <el-image v-if="editImage != ''" class="main-width" style="margin-top: 10px; border-radius: 20px;"
@@ -123,6 +124,13 @@ const getTimestamp = () => {
     align-items: center;
     justify-items: center;
     width: 100%;
+}
+
+.word-count-text {
+    text-align: right;
+    font-size: 12px;
+    font-style: italic;
+    color: #888888;
 }
 
 .main-width {
