@@ -58,7 +58,6 @@ const sendComment = async () => {
     commentToSend.value.postTime = getTimestamp()
 
     const commResp = await ApiPost('comment/save', commentToSend.value)
-    // console.log(commResp)
 
     commentToId.value = ''
     router.go(0)
@@ -73,16 +72,6 @@ const commentAvatarClick = (index) => {
         }
     })
 }
-
-// let curComment = 0
-// const initComment = async (comment) => {
-//     // console.log('comment init' + comment.username)
-//     const userResp = await ApiGet('getUserinfoById?username=' + comment.username)
-//     curComment++
-//     // console.log(userResp)
-//     commentSenders.value.push(userResp.obj)
-//     // console.log(userResp.obj)
-// }
 
 const getTimestamp = () => {
     const today = new Date();
