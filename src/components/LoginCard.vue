@@ -242,20 +242,11 @@ const upload = async (e) => {
 						</el-col>
 						<el-col :span="23"><el-input v-model="newChildID" placeholder="学生学号"></el-input></el-col>
 					</el-row>
-					<!-- 查询学号对应的名字显示在下面 -->
-					<div v-if="newChildID != ''">success ? 学生姓名为xxx : 未找到学生</div>
 				</div>
 				<div style="height: 30px;" />
 			</div>
 
 			<div v-if="step == 3">
-				<!-- <el-upload class="avatar-uploader" action="/api/common/register/upload" :show-file-list="false"
-					:on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-					<img v-if="imageUrl" :src="imageUrl" class="avatar" />
-					<el-icon v-else class="avatar-uploader-icon">
-						<Plus />
-					</el-icon>
-				</el-upload> -->
 				<input style="width: 100%;" type="file" id="uFile" name="uFile" @change="upload($event)" />
 				<div style="height: 30px;" />
 			</div>
