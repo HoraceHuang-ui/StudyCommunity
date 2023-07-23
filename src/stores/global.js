@@ -16,7 +16,6 @@ export const useGlobalStore = defineStore("global", () => {
 
   const userCache = reactive({});
   const postCache = reactive({});
-  const commentCache = reactive({});
 
   const setUserInfo = (_userInfo) => {
     userInfo.value = { ..._userInfo };

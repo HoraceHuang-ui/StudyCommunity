@@ -90,7 +90,7 @@ const sendClick = async () => {
         postTime: timestamp,
         username: userInfo.value.username,
         clazzId: userInfo.value.clazzId,
-        likes: globalStore.postCache[editPostId.value].likes * 1
+        likes: globalStore.postCache[editPostId.value] ? (globalStore.postCache[editPostId.value].likes * 1) : 0
     }
 
     const headers = {
