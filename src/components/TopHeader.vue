@@ -27,6 +27,11 @@ const logoutClick = () => {
         name: "login"
     })
 }
+const uinfoEditClick = () => {
+    router.push({
+        name: "edituserinfo"
+    })
+}
 
 onMounted(async () => {
     if (globalStore.userInfo.username === '') {
@@ -68,6 +73,7 @@ onMounted(async () => {
                         <template #dropdown>
                             <el-dropdown-menu>
                                 <el-dropdown-item @click="logoutClick">登出</el-dropdown-item>
+                                <el-dropdown-item @click="uinfoEditClick">编辑</el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>

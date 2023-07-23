@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage.vue";
 import PostInfoPage from "./pages/PostInfoPage.vue";
 import PostEditPage from "./pages/PostEditPage.vue";
 import PersonPostsPage from "./pages/PersonPostsPage.vue";
+import UserinfoEditPage from "./pages/UserinfoEditPage.vue";
 
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(),
@@ -32,6 +33,11 @@ const router = VueRouter.createRouter({
       name: "personposts",
       path: "/personposts",
       component: PersonPostsPage,
+    },
+    {
+      name: "edituserinfo",
+      path: "/edituserinfo",
+      component: UserinfoEditPage,
     },
   ],
 });

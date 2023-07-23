@@ -152,117 +152,110 @@ const upload = async (e) => {
 </script>
 
 <template>
-	<div>
-		<el-card class="login-card">
+	<el-card class="login-card">
+		<el-form-item prop="account">
+			<el-input v-model="newPhone" type="username" placeholder="用户名" @keyup.enter.native="login" />
+		</el-form-item>
+		<el-form-item prop="password">
+			<el-input v-model="pwd" type="password" placeholder="密码" @keyup.enter.native="login" />
+		</el-form-item>
+		<el-row style="display: flex; justify-content: center;">
+			<el-col :span="6"><el-button @click="regShow = true" type="primary" plain>注册</el-button></el-col>
+			<el-col :span="6"><el-button @click="login" type="primary">登录</el-button></el-col>
+		</el-row>
+	</el-card>
+	<el-dialog v-model="regShow" :before-close="handleDialogClose" :title="dialogTitle" width="400px"
+		style="max-height: 800px;">
+		<div v-if="step == 1">
 			<el-row>
-				<el-col :span="24"><el-input v-model="newPhone" type="username" placeholder="用户名" @keyup.enter.native="login" /></el-col>
+				<el-col :span="1">
+					<div style="color: red">*</div>
+				</el-col>
+				<el-col :span="23"><el-input v-model="newUsername" placeholder="姓名"></el-input></el-col>
 			</el-row>
-			<div style="height: 20px;" />
-			<el-row style="display: flex; justify-content: space-between; align-items: center;">
-				<el-col :span="18"><el-input v-model="pwd" type="password" placeholder="密码"
-						@keyup.enter.native="login" /></el-col>
-				<el-col :span="6" link><el-button @click="forgotPwd">忘记密码</el-button></el-col>
+			<div style="height: 10px;" />
+			<el-row>
+				<el-col :span="1">
+					<div style="color: red">*</div>
+				</el-col>
+				<el-col :span="23"><el-input v-model="newPhone" placeholder="用户名"></el-input></el-col>
 			</el-row>
-			<div style="height: 20px;" />
-			<el-row style="display: flex; justify-content: center;">
-				<el-col :span="6"><el-button @click="regShow = true" type="primary" plain>注册</el-button></el-col>
-				<el-col :span="6"><el-button @click="login" type="primary">登录</el-button></el-col>
+			<div style="height: 10px;" />
+			<el-row>
+				<el-col :span="1">
+					<div style="color: red">*</div>
+				</el-col>
+				<el-col :span="23"><el-input v-model="newPwd" placeholder="密码"></el-input></el-col>
 			</el-row>
-		</el-card>
-		<el-dialog v-model="regShow" :before-close="handleDialogClose" :title="dialogTitle" width="400px"
-			style="max-height: 800px;">
-			<div v-if="step == 1">
-				<el-row>
-					<el-col :span="1">
-						<div style="color: red">*</div>
-					</el-col>
-					<el-col :span="23"><el-input v-model="newUsername" placeholder="姓名"></el-input></el-col>
-				</el-row>
-				<div style="height: 10px;" />
-				<el-row>
-					<el-col :span="1">
-						<div style="color: red">*</div>
-					</el-col>
-					<el-col :span="23"><el-input v-model="newPhone" placeholder="用户名"></el-input></el-col>
-				</el-row>
-				<div style="height: 10px;" />
-				<el-row>
-					<el-col :span="1">
-						<div style="color: red">*</div>
-					</el-col>
-					<el-col :span="23"><el-input v-model="newPwd" placeholder="密码"></el-input></el-col>
-				</el-row>
-				<div style="height: 10px;" />
-				<el-row>
-					<el-col :span="1"></el-col>
-					<el-col :span="11">
-						<el-select v-model="role" value-key="id" placeholder="请选择身份">
-							<el-option v-for="item in roles" :value="item" :key="item.id" :label="item.label" />
-						</el-select>
-					</el-col>
-					<el-col :span="1"></el-col>
-					<el-col :span="11">
-						<el-select v-model="sex" value-key="id" placeholder="请选择性别">
-							<el-option v-for="item in sexes" :value="item" :key="item.id" :label="item.label" />
-						</el-select>
-					</el-col>
-				</el-row>
-				<div style="height: 10px;" />
-				<div>{{ role.desc }}</div>
-				<div style="height: 30px;" />
-			</div>
+			<div style="height: 10px;" />
+			<el-row>
+				<el-col :span="1"></el-col>
+				<el-col :span="11">
+					<el-select v-model="role" value-key="id" placeholder="请选择身份">
+						<el-option v-for="item in roles" :value="item" :key="item.id" :label="item.label" />
+					</el-select>
+				</el-col>
+				<el-col :span="1"></el-col>
+				<el-col :span="11">
+					<el-select v-model="sex" value-key="id" placeholder="请选择性别">
+						<el-option v-for="item in sexes" :value="item" :key="item.id" :label="item.label" />
+					</el-select>
+				</el-col>
+			</el-row>
+			<div style="height: 10px;" />
+			<div>{{ role.desc }}</div>
+			<div style="height: 30px;" />
+		</div>
 
-			<div v-if="step == 2">
-				<el-row>
-					<el-col :span="1">
-						<div style="color: red">*</div>
-					</el-col>
-					<el-col :span="23"><el-input v-model="newSchool" placeholder="学校"></el-input></el-col>
-				</el-row>
+		<div v-if="step == 2">
+			<el-row>
+				<el-col :span="1">
+					<div style="color: red">*</div>
+				</el-col>
+				<el-col :span="23"><el-input v-model="newSchool" placeholder="学校"></el-input></el-col>
+			</el-row>
+			<div style="height: 10px;" />
+			<el-row>
+				<el-col :span="1">
+					<div style="color: red">*</div>
+				</el-col>
+				<el-col :span="23"><el-input v-model="newClazz" placeholder="班级"></el-input></el-col>
+			</el-row>
+			<div v-if="role.id == 1 || role.id == 2">
 				<div style="height: 10px;" />
 				<el-row>
 					<el-col :span="1">
 						<div style="color: red">*</div>
 					</el-col>
-					<el-col :span="23"><el-input v-model="newClazz" placeholder="班级"></el-input></el-col>
+					<el-col :span="23"><el-input v-model="newSubj" placeholder="任教学科"></el-input></el-col>
 				</el-row>
-				<div v-if="role.id == 1 || role.id == 2">
-					<div style="height: 10px;" />
-					<el-row>
-						<el-col :span="1">
-							<div style="color: red">*</div>
-						</el-col>
-						<el-col :span="23"><el-input v-model="newSubj" placeholder="任教学科"></el-input></el-col>
-					</el-row>
-				</div>
-				<div v-if="role.id == 3">
-					<div style="height: 10px;" />
-					<el-row>
-						<el-col :span="1">
-							<div style="color: red">*</div>
-						</el-col>
-						<el-col :span="23"><el-input v-model="newChildID" placeholder="学生学号"></el-input></el-col>
-					</el-row>
-				</div>
-				<div style="height: 30px;" />
 			</div>
-
-			<div v-if="step == 3">
-				<input style="width: 100%;" type="file" id="uFile" name="uFile" @change="upload($event)" />
-				<div style="height: 30px;" />
+			<div v-if="role.id == 3">
+				<div style="height: 10px;" />
+				<el-row>
+					<el-col :span="1">
+						<div style="color: red">*</div>
+					</el-col>
+					<el-col :span="23"><el-input v-model="newChildID" placeholder="学生学号"></el-input></el-col>
+				</el-row>
 			</div>
+			<div style="height: 30px;" />
+		</div>
 
-			<el-row style="display: flex; justify-content: center;">
-				<el-col v-if="step == 1 || step == 3" :span="6"><el-button @click="handleDialogClose"
-						plain>取消</el-button></el-col>
-				<el-col v-if="step > 1 && step < 3" :span="6"><el-button @click="step--" plain>上一步</el-button></el-col>
-				<el-col v-if="step < 2" :span="6"><el-button @click="step++" type="primary">下一步</el-button></el-col>
-				<el-col v-if="step == 2" :span="6"><el-button @click="register" type="primary">确认信息</el-button></el-col>
-				<el-col v-if="step == 3" :span="6"><el-button @click="handleDialogClose"
-						type="primary">完成</el-button></el-col>
-			</el-row>
-		</el-dialog>
-	</div>
+		<div v-if="step == 3">
+			<input style="width: 100%;" type="file" id="uFile" name="uFile" @change="upload($event)" />
+			<div style="height: 30px;" />
+		</div>
+
+		<el-row style="display: flex; justify-content: center;">
+			<el-col v-if="step == 1 || step == 3" :span="6"><el-button @click="handleDialogClose"
+					plain>取消</el-button></el-col>
+			<el-col v-if="step > 1 && step < 3" :span="6"><el-button @click="step--" plain>上一步</el-button></el-col>
+			<el-col v-if="step < 2" :span="6"><el-button @click="step++" type="primary">下一步</el-button></el-col>
+			<el-col v-if="step == 2" :span="6"><el-button @click="register" type="primary">确认信息</el-button></el-col>
+			<el-col v-if="step == 3" :span="6"><el-button @click="handleDialogClose" type="primary">完成</el-button></el-col>
+		</el-row>
+	</el-dialog>
 </template>
 
 <style scoped>
@@ -275,7 +268,9 @@ const upload = async (e) => {
 
 <style>
 .login-card {
-	width: 400px;
+	width: 80%;
+	min-width: 300px;
+	max-width: 400px;
 	height: 175px;
 }
 
