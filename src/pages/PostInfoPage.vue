@@ -145,7 +145,8 @@ const getTimestamp = () => {
                 <div style="height: 15.5vh;"></div>
             </el-scrollbar>
             <div class="bottom-input-container">
-                <el-input :placeholder="placeholderText" v-model="commentText" class="bottom-input">
+                <el-input :placeholder="placeholderText" v-model="commentText" class="bottom-input"
+                    @keyup.enter.native="sendComment">
                     <template #append>
                         <el-button @click="sendComment">发送</el-button>
                     </template>

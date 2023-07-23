@@ -155,11 +155,12 @@ const upload = async (e) => {
 	<div>
 		<el-card class="login-card">
 			<el-row>
-				<el-col :span="24"><el-input v-model="newPhone" placeholder="用户名" /></el-col>
+				<el-col :span="24"><el-input v-model="newPhone" type="username" placeholder="用户名" @keyup.enter.native="login" /></el-col>
 			</el-row>
 			<div style="height: 20px;" />
 			<el-row style="display: flex; justify-content: space-between; align-items: center;">
-				<el-col :span="18"><el-input v-model="pwd" placeholder="密码" /></el-col>
+				<el-col :span="18"><el-input v-model="pwd" type="password" placeholder="密码"
+						@keyup.enter.native="login" /></el-col>
 				<el-col :span="6" link><el-button @click="forgotPwd">忘记密码</el-button></el-col>
 			</el-row>
 			<div style="height: 20px;" />
